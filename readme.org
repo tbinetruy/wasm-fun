@@ -1,0 +1,5 @@
+* Build
+
+#+begin_src bash
+wat2wasm index.wat -o index.wasm
+#+end_src

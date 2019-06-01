@@ -64,17 +64,31 @@ class Test_find_free extends Test {
 
 class Test_check_free_space extends Test {
     init_mem(mem) {
+        this.c = 10;
+        this.d = 20;
+        this.offset = 4;
+
         var i32 = new Uint32Array(mem.buffer);
-        let c = 10;
-        for (var i = 0; i < c; i++) {
+        for (let i = 0; i < this.d + this.offset; i++) {
+            i32[i] = 0;
+        }
+        for (let i = 0; i < this.c; i++) {
             i32[i] = 1;
         }
-        i32[c] = 0;
+        for (let i = this.c + this.offset; i < this.d; i++) {
+            i32[i] = 1;
+        }
+        window.mem = mem;
     }
     test_suite(exports) {
         const { check_free_space } = exports;
-        this.test(check_free_space(0, 5 * SIZE.i32), 0);
-        this.test(check_free_space(10 * SIZE.i32, 5 * SIZE.i32), 1);
+        this.test(check_free_space(0, 4 * SIZE.i32), 0);
+        this.test(check_free_space(0, this.c * SIZE.i32), 0);
+        this.test(check_free_space(0, (this.c + 1) * SIZE.i32), 0);
+        this.test(check_free_space(this.c * SIZE.i32, (this.offset - 1) * SIZE.i32), 1);
+        this.test(check_free_space(this.c * SIZE.i32, this.offset * SIZE.i32), 1);
+        this.test(check_free_space(this.c * SIZE.i32, (this.offset + 1) * SIZE.i32), 0);
+        this.test(check_free_space(this.d * SIZE.i32, 10 * SIZE.i32), 1);
     }
 }
 

@@ -63,9 +63,10 @@ class Test_find_free extends Test {
             i32[i] = 1;
         }
     }
+
     test_suite(exports) {
         const { find_free } = exports;
-        this.test(find_free(0), 40);
+        this.test(find_free(0), this.c * SIZE.i32);
         this.test(find_free(this.c - 9), this.c * SIZE.i32);
         this.test(find_free(this.c), this.c * SIZE.i32);
         this.test(find_free(this.c + 1), (this.c + 1) * SIZE.i32);
@@ -90,6 +91,7 @@ class Test_check_free_space extends Test {
             i32[i] = 1;
         }
     }
+
     test_suite(exports) {
         const { check_free_space } = exports;
         this.test(check_free_space(0, 4 * SIZE.i32), 0);

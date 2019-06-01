@@ -86,5 +86,4 @@
  (export "find_free" (func $find_free))
  (export "malloc" (func $malloc))
  (export "create_list" (func $create_list))
- (export "add_element" (func $add_element))
-)
+ (export "add_element" (func $add_element)))

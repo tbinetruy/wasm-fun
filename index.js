@@ -75,7 +75,7 @@ class Test_check_free_space extends Test {
         for (let i = 0; i < this.c; i++) {
             i32[i] = 1;
         }
-        for (let i = this.c + this.offset; i < this.d; i++) {
+        for (let i = (this.c + 1) + this.offset; i < this.d; i++) {
             i32[i] = 1;
         }
         window.mem = mem;
@@ -88,7 +88,7 @@ class Test_check_free_space extends Test {
         this.test(check_free_space(this.c * SIZE.i32, (this.offset - 1) * SIZE.i32), 1);
         this.test(check_free_space(this.c * SIZE.i32, this.offset * SIZE.i32), 1);
         this.test(check_free_space(this.c * SIZE.i32, (this.offset + 1) * SIZE.i32), 0);
-        this.test(check_free_space(this.d * SIZE.i32, 10 * SIZE.i32), 1);
+        this.test(check_free_space(this.d * SIZE.i32, this.offset * SIZE.i32), 1);
     }
 }
 

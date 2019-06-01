@@ -5,30 +5,33 @@
        (local $i i32)
        (local $return i32)
 
-       (set_local $i (i32.const 0))
+       (get_local $start)
+       (set_local $i)
        (set_local $return (i32.const 0))
 
        (block $iter
          (loop
-          (get_local $start)
           (get_local $i)
-          (i32.add)
           (i32.load)
           (i32.const 0)
           (i32.eq)
-          (get_local $i)
-          (get_local $length)
-          (i32.eq)
-          (i32.and)
           (if
               (then
                (set_local $return (i32.const 1)))
               (else
                (set_local $return (i32.const 0))))
 
+
           (get_local $i)
           (get_local $length)
+          (get_local $start)
+          (i32.add)
           (i32.eq)
+          (get_local $i)
+          (i32.load)
+          (i32.const 0)
+          (i32.ne)
+          (i32.or)
           (br_if $iter)
 
           (i32.const 4)

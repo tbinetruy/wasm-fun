@@ -62,7 +62,6 @@ class Test_find_free extends Test {
         for (let i = this.c + this.offset; i < 2 * this.c + this.offset; i++) {
             i32[i] = 1;
         }
-        window.mem = new Uint32Array(mem.buffer);
     }
     test_suite(exports) {
         const { find_free } = exports;
@@ -88,7 +87,6 @@ class Test_check_free_space extends Test {
         for (let i = (this.c + 1) + this.offset; i < this.d; i++) {
             i32[i] = 1;
         }
-        window.mem = mem;
     }
     test_suite(exports) {
         const { check_free_space } = exports;

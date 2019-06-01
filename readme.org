@@ -1,5 +1,7 @@
 * Build
 
 #+begin_src bash
-wat2wasm index.wat -o index.wasm
+wat2wasm linked_list.wat -o linked_list.wasm
+python -m http.server
+firefox http://localhost:8000
 #+end_src

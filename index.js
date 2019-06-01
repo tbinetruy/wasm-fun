@@ -50,15 +50,25 @@ class Test {
 class Test_find_free extends Test {
     init_mem(mem) {
         var i32 = new Uint32Array(mem.buffer);
-        let c = 10;
-        for (var i = 0; i < c; i++) {
+        this.c = 10;
+        this.offset = 4;
+
+        for (let i = 0; i < 2*this.c + this.offset; i++) {
+            i32[i] = 0;
+        }
+        for (let i = 0; i < this.c; i++) {
             i32[i] = 1;
         }
-        i32[c] = 0;
+        for (let i = this.c + this.offset; i < 2 * this.c + this.offset; i++) {
+            i32[i] = 1;
+        }
+        window.mem = new Uint32Array(mem.buffer);
     }
     test_suite(exports) {
         const { find_free } = exports;
         this.test(find_free(0), 40);
+        this.test(find_free(this.c - 9), 40);
+        this.test(find_free(this.c), 40);
     }
 }
 

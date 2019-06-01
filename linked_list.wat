@@ -43,6 +43,10 @@
        get_local $return)
 
  (func $find_free (param $i i32) (result i32)
+       (get_local $i)
+       (i32.const 4)
+       (i32.mul)
+       (set_local $i)
        (block $iter
          (loop
            (get_local $i)
@@ -56,7 +60,7 @@
            (i32.add)
            (set_local $i)
            (br 0)))
-       get_local $i)
+       (get_local $i))
 
  (func $malloc (param $l i32) (result i32)
        (local $i i32)

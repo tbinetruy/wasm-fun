@@ -114,7 +114,7 @@ class Test_malloc extends Test {
         for (let i = 0; i < this.d + this.offset; i++) {
             i32[i] = 0;
         }
-        for (let i = 0; i < this.c; i++) {
+        for (let i = SIZE.i32; i < this.c; i++) {
             i32[i] = 1;
         }
         for (let i = (this.c + 1) + this.offset; i < this.d; i++) {
@@ -124,6 +124,7 @@ class Test_malloc extends Test {
 
     test_suite(exports) {
         const { malloc } = exports;
+        this.test(malloc(SIZE.i32), 0);
         this.test(malloc(4 * SIZE.i32), this.c * SIZE.i32);
         this.test(malloc((this.offset + 1) * SIZE.i32), this.d * SIZE.i32);
     }

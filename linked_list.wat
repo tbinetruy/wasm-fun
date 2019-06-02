@@ -62,17 +62,32 @@
            (br 0)))
        (get_local $i))
 
- (func $malloc (param $l i32) (result i32)
+ (func $malloc (param $length i32) (result i32)
        (local $i i32)
-       (local $j i32)
+       (local $return i32)
 
        (set_local $i (i32.const 0))
-       (set_local $j (i32.const 0))
+       (set_local $return (i32.const -1))
 
-       (get_local $i)
-       (call $find_free)
-       (set_local $i)
-       (get_local $i))
+       (block $iter
+         (loop
+          (get_local $i)
+          (call $find_free)
+          (set_local $return)
+          (get_local $return)
+          (get_local $length)
+          (call $check_free_space)
+          (br_if $iter)
+
+          (set_local $return (i32.const -1))
+
+          (i32.const 4)
+          (get_local $i)
+          (i32.add)
+          (set_local $i)
+
+          (br 0)))
+       (get_local $return))
 
  (func $create_list (result i32)
        i32.const 1

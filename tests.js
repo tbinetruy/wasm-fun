@@ -104,5 +104,31 @@ class Test_check_free_space extends Test {
     }
 }
 
+class Test_malloc extends Test {
+    init_mem(mem) {
+        this.c = 10;
+        this.d = 30;
+        this.offset = 10;
+
+        var i32 = new Uint32Array(mem.buffer);
+        for (let i = 0; i < this.d + this.offset; i++) {
+            i32[i] = 0;
+        }
+        for (let i = 0; i < this.c; i++) {
+            i32[i] = 1;
+        }
+        for (let i = (this.c + 1) + this.offset; i < this.d; i++) {
+            i32[i] = 1;
+        }
+    }
+
+    test_suite(exports) {
+        const { malloc } = exports;
+        this.test(malloc(4 * SIZE.i32), this.c * SIZE.i32);
+        this.test(malloc((this.offset + 1) * SIZE.i32), this.d * SIZE.i32);
+    }
+}
+
 new Test_find_free();
 new Test_check_free_space();
+new Test_malloc();

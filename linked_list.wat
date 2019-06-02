@@ -47,10 +47,6 @@
        get_local $return)
 
  (func $find_free (param $i i32) (result i32)
-       (get_local $i)
-       (get_global $size_i32)
-       (i32.mul)
-       (set_local $i)
        (block $iter
          (loop
            (get_local $i)

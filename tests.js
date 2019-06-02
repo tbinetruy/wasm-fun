@@ -79,10 +79,10 @@ class Test_find_free extends Test {
     test_suite(exports) {
         const { find_free } = exports;
         this.test(find_free(0), this.c * SIZE.i32);
-        this.test(find_free(this.c - 9), this.c * SIZE.i32);
-        this.test(find_free(this.c), this.c * SIZE.i32);
-        this.test(find_free(this.c + 1), (this.c + 1) * SIZE.i32);
-        this.test(find_free(this.c + this.offset), (2 * this.c + this.offset) * SIZE.i32);
+        this.test(find_free((this.c - 9) * SIZE.i32), this.c * SIZE.i32);
+        this.test(find_free((this.c) * SIZE.i32), this.c * SIZE.i32);
+        this.test(find_free((this.c + 1) * SIZE.i32), (this.c + 1) * SIZE.i32);
+        this.test(find_free((this.c + this.offset) * SIZE.i32), (2 * this.c + this.offset) * SIZE.i32);
     }
 }
 

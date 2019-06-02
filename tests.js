@@ -207,9 +207,36 @@ class Test_find_last_element extends Test {
         this.test(find_last_element(list2_addr), list2_addr + SIZE.i32);
     }
 }
+
+class Test_add_element extends Test {
+    init_mem(mem) {
+        this.memory = mem;
+
+        this.mem_quick_init(mem, [10, 1, 20], 4);
+    }
+
+    test_suite(exports) {
+        const { create_list, add_element } = exports;
+        const list_addr = create_list();
+        const el1 = 15;
+        this.test(add_element(list_addr, el1), list_addr);
+
+        let i32 = new Uint32Array(this.memory.buffer);
+        this.test(i32[list_addr / SIZE.i32 + 1], el1);
+        this.test(i32[list_addr / SIZE.i32 + 2], DELIMETERS.list_end);
+
+        const el2 = 16;
+        add_element(list_addr, el2);
+
+        this.test(i32[this.d], el2);
+        this.test(i32[this.d + 1], DELIMETERS.list_end);
+    }
+}
+
 new Test_find_free();
 new Test_check_free_space();
 new Test_malloc();
 new Test_create_list();
+new Test_add_element();
 new Test_is_list_empty();
 new Test_find_last_element();

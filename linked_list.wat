@@ -117,8 +117,6 @@
 
        (get_local $pointer))
 
- (func $add_element (param $el i32) (param $list i32) (result i32)
-       get_local $el)
  (func $is_list_empty (param $list_addr i32) (result i32)
        (local $return i32)
        (get_global $size_i32)
@@ -166,6 +164,44 @@
 
                (br 0)))))
        (get_local $return))
+
+ (func $add_element (param $list_addr i32) (param $el i32) (result i32)
+       (local $pointer i32)
+       (get_local $list_addr)
+       (call $is_list_empty)
+       (if
+           (then
+            (get_local $list_addr)
+            (get_global $size_i32)
+            (i32.add)
+            (get_local $el)
+            (i32.store))
+           (else
+
+            (i32.const 2)
+            (get_global $size_i32)
+            (i32.mul)
+            (call $malloc)
+            (set_local $pointer)
+
+            (get_local $list_addr)
+            (call $find_last_element)
+            (get_global $size_i32)
+            (i32.add)
+            (get_local $pointer)
+            (i32.store)
+
+            (get_local $pointer)
+            (get_local $el)
+            (i32.store)
+
+            (get_local $pointer)
+            (get_global $size_i32)
+            (i32.add)
+            (get_global $list_end_char)
+            (i32.store)))
+       (get_local $list_addr))
+
  (export "check_free_space" (func $check_free_space))
  (export "find_free" (func $find_free))
  (export "malloc" (func $malloc))

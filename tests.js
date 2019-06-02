@@ -4,8 +4,8 @@ const SIZE = {
 
 const DELIMETERS = {
     null: 0,
-    list_start: 100,
-    list_end: 200,
+    list_start: 1000,
+    list_end: 2000,
 };
 
 class Test {

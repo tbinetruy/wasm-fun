@@ -171,8 +171,45 @@ class Test_is_list_empty extends Test {
     }
 }
 
+class Test_find_last_element extends Test {
+    init_mem(mem) {
+        const spec = [
+            DELIMETERS.list_start, // list starts
+            15,                    // value
+            4 * SIZE.i32,          // next address
+            DELIMETERS.null,
+            15,                    // value
+            9 * SIZE.i32,          // next address
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            15,                    // value
+            DELIMETERS.list_end,   // list ends
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.list_start, // list starts
+            15,
+            DELIMETERS.list_end,   // list ends
+        ];
+
+        let i32 = new Uint32Array(mem.buffer);
+        for(let i = 0; i < spec.length; i++) {
+            i32[i] = spec[i];
+        }
+    }
+
+    test_suite(exports) {
+        const { find_last_element } = exports;
+        const list1_addr = 0;
+        const list2_addr = 14 * SIZE.i32;
+        this.test(find_last_element(list1_addr), 9 * SIZE.i32);
+        this.test(find_last_element(list2_addr), list2_addr + SIZE.i32);
+    }
+}
 new Test_find_free();
 new Test_check_free_space();
 new Test_malloc();
 new Test_create_list();
 new Test_is_list_empty();
+new Test_find_last_element();

@@ -134,9 +134,42 @@
             (set_local $return (i32.const 0))))
        (get_local $return))
 
+ (func $find_last_element (param $list_addr i32) (result i32)
+       (local $return i32)
+       (local $pointer i32)
+       (get_local $list_addr)
+       (call $is_list_empty)
+       (if
+           (then
+            (get_local $list_addr)
+            (set_local $return))
+           (else
+            (get_local $list_addr)
+            (get_global $size_i32)
+            (i32.add)
+            (set_local $pointer)
+            (block $iter
+              (loop
+               (get_local $pointer)
+               (set_local $return)
+
+               (get_local $pointer)
+               (get_global $size_i32)
+               (i32.add)
+               (i32.load)
+               (set_local $pointer)
+
+               (get_local $pointer)
+               (get_global $list_end_char)
+               (i32.eq)
+               (br_if $iter)
+
+               (br 0)))))
+       (get_local $return))
  (export "check_free_space" (func $check_free_space))
  (export "find_free" (func $find_free))
  (export "malloc" (func $malloc))
  (export "create_list" (func $create_list))
  (export "is_list_empty" (func $is_list_empty))
+ (export "find_last_element" (func $find_last_element))
  (export "add_element" (func $add_element)))

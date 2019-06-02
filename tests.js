@@ -56,31 +56,37 @@ class Test {
         this.init_mem(memory);
         return memory;
     }
+
+    mem_quick_init(mem, [start, offset, end], start_offset = 0) {
+        let i32 = new Uint32Array(mem.buffer);
+
+        for (let i = 0; i < 2 * end; i++) {
+            i32[i] = DELIMETERS.null;
+        }
+        for (let i = start_offset; i < start; i++) {
+            i32[i] = 1;
+        }
+        for (let i = start + offset; i < end; i++) {
+            i32[i] = 1;
+        }
+
+        this.c = start;
+        this.d = end;
+        this.offset = offset;
+    }
 }
 
 
 class Test_find_free extends Test {
     init_mem(mem) {
-        var i32 = new Uint32Array(mem.buffer);
-        this.c = 10;
-        this.offset = 4;
-
-        for (let i = 0; i < 2*this.c + this.offset; i++) {
-            i32[i] = DELIMETERS.null;
-        }
-        for (let i = 0; i < this.c; i++) {
-            i32[i] = 1;
-        }
-        for (let i = this.c + this.offset; i < 2 * this.c + this.offset; i++) {
-            i32[i] = 1;
-        }
+        this.mem_quick_init(mem, [10, 4, 24]);
     }
 
     test_suite(exports) {
         const { find_free } = exports;
         this.test(find_free(0), this.c * SIZE.i32);
         this.test(find_free((this.c - 9) * SIZE.i32), this.c * SIZE.i32);
-        this.test(find_free((this.c) * SIZE.i32), this.c * SIZE.i32);
+        this.test(find_free(this.c * SIZE.i32), this.c * SIZE.i32);
         this.test(find_free((this.c + 1) * SIZE.i32), (this.c + 1) * SIZE.i32);
         this.test(find_free((this.c + this.offset) * SIZE.i32), (2 * this.c + this.offset) * SIZE.i32);
     }
@@ -88,20 +94,9 @@ class Test_find_free extends Test {
 
 class Test_check_free_space extends Test {
     init_mem(mem) {
-        this.c = 10;
-        this.d = 20;
-        this.offset = 4;
-
-        var i32 = new Uint32Array(mem.buffer);
-        for (let i = 0; i < this.d + this.offset; i++) {
-            i32[i] = DELIMETERS.null;
-        }
-        for (let i = 0; i < this.c; i++) {
-            i32[i] = 1;
-        }
-        for (let i = (this.c + 1) + this.offset; i < this.d; i++) {
-            i32[i] = 1;
-        }
+        const offset = SIZE.i32;
+        this.mem_quick_init(mem, [10, offset + 1, 20]);
+        this.offset = offset;
     }
 
     test_suite(exports) {
@@ -118,20 +113,7 @@ class Test_check_free_space extends Test {
 
 class Test_malloc extends Test {
     init_mem(mem) {
-        this.c = 10;
-        this.d = 30;
-        this.offset = 10;
-
-        var i32 = new Uint32Array(mem.buffer);
-        for (let i = 0; i < this.d + this.offset; i++) {
-            i32[i] = DELIMETERS.null;
-        }
-        for (let i = SIZE.i32; i < this.c; i++) {
-            i32[i] = 1;
-        }
-        for (let i = (this.c + 1) + this.offset; i < this.d; i++) {
-            i32[i] = 1;
-        }
+        this.mem_quick_init(mem, [10, 10, 30], SIZE.i32);
     }
 
     test_suite(exports) {
@@ -144,16 +126,9 @@ class Test_malloc extends Test {
 
 class Test_create_list extends Test {
     init_mem(mem) {
-        this.c = 10;
         this.memory = mem;
 
-        let i32 = new Uint32Array(mem.buffer);
-        for (let i = 0; i < 2 * this.c; i++) {
-            i32[i] = DELIMETERS.null;
-        }
-        for (let i = 0; i < this.c; i++) {
-            i32[i] = 1;
-        }
+        this.mem_quick_init(mem, [10, 100, 300]);
     }
 
     test_suite(exports) {

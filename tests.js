@@ -231,6 +231,56 @@ class Test_add_element extends Test {
     }
 }
 
+class Test_integration extends Test {
+    init_mem(mem) {
+        this.memory = mem;
+
+        this.mem_quick_init(mem, [10, 1, 20], 4);
+    }
+
+    read_list(addr) {
+        const list = [];
+        addr = addr / SIZE.i32;
+
+        let i32 = new Uint32Array(this.memory.buffer);
+
+        if (i32[addr + 1] === DELIMETERS.list_end)
+            return list;
+        else if (i32[addr + 2] === DELIMETERS.list_end)
+            return [i32[addr + 1]];
+        window.mem = i32;
+
+        addr += 1;
+        do {
+            const value = i32[addr];
+            const next_addr = i32[addr + 1];
+            list.push(value);
+            if (next_addr === DELIMETERS.list_end)
+                return list;
+            addr = next_addr / SIZE.i32;
+        } while(1);
+
+        return -1;
+    }
+
+    test_suite(exports) {
+        const { create_list, add_element } = exports;
+        const list_addr = create_list();
+        const els = [1, 2, 5, 4, 3, 6, 7];
+        for(let i = 0; i < els.length; i++) {
+            add_element(list_addr, els[i]);
+        }
+        const list = this.read_list(list_addr);
+        const flag = true;
+        for(let i = 0; i < els.length; i++) {
+            add_element(list_addr, els[i]);
+            if(list[i] !== els[i])
+                flag = false;
+        }
+        this.test(flag, true);
+    }
+}
+
 new Test_find_free();
 new Test_check_free_space();
 new Test_malloc();
@@ -238,3 +288,4 @@ new Test_create_list();
 new Test_add_element();
 new Test_is_list_empty();
 new Test_find_last_element();
+new Test_integration();

@@ -143,7 +143,36 @@ class Test_create_list extends Test {
     }
 }
 
+class Test_is_list_empty extends Test {
+    init_mem(mem) {
+        const spec = [
+            DELIMETERS.list_start,
+            DELIMETERS.list_end,
+            DELIMETERS.list_end,
+            0,
+            DELIMETERS.list_start,
+            1,
+            DELIMETERS.list_end,
+        ];
+
+        let i32 = new Uint32Array(mem.buffer);
+        for(let i = 0; i < spec.length; i++) {
+            i32[i] = spec[i];
+        }
+        window.mem = new Uint32Array(mem.buffer);
+    }
+
+    test_suite(exports) {
+        const { create_list, is_list_empty } = exports;
+        const list1_addr = 0;
+        const list2_addr = 4 * SIZE.i32;
+        this.test(is_list_empty(list1_addr), 1);
+        this.test(is_list_empty(list2_addr), 0);
+    }
+}
+
 new Test_find_free();
 new Test_check_free_space();
 new Test_malloc();
 new Test_create_list();
+new Test_is_list_empty();

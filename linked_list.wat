@@ -119,9 +119,24 @@
 
  (func $add_element (param $el i32) (param $list i32) (result i32)
        get_local $el)
+ (func $is_list_empty (param $list_addr i32) (result i32)
+       (local $return i32)
+       (get_global $size_i32)
+       (get_local $list_addr)
+       (i32.add)
+       (i32.load)
+       (get_global $list_end_char)
+       (i32.eq)
+       (if
+           (then
+            (set_local $return (i32.const 1)))
+           (else
+            (set_local $return (i32.const 0))))
+       (get_local $return))
 
  (export "check_free_space" (func $check_free_space))
  (export "find_free" (func $find_free))
  (export "malloc" (func $malloc))
  (export "create_list" (func $create_list))
+ (export "is_list_empty" (func $is_list_empty))
  (export "add_element" (func $add_element)))

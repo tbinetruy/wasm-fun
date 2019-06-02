@@ -29,7 +29,13 @@ class Test {
     async load_wasm() {
         const memory = this.get_mem();
 
-        const importObject = { js: { mem: memory } };
+        const globals = {
+            size_int: SIZE.i32,
+            list_start_char: DELIMETERS.list_start,
+            list_end_char: DELIMETERS.list_end,
+            null_char: DELIMETERS.null,
+        };
+        const importObject = { js: { mem: memory }, globals };
         const response = await fetch("linked_list.wasm");
         const buffer = await response.arrayBuffer();
         const obj = await WebAssembly.instantiate(buffer, importObject);

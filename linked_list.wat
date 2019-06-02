@@ -1,5 +1,9 @@
 (module
  (import "js" "mem" (memory 1))
+ (global $size_i32 (import "globals" "size_int") i32)
+ (global $list_start_char (import "globals" "list_start_char") i32)
+ (global $list_end_char (import "globals" "list_end_char") i32)
+ (global $null_char (import "globals" "null_char") i32)
 
  (func $check_free_space (param $start i32) (param $length i32) (result i32)
        (local $i i32)
@@ -13,7 +17,7 @@
          (loop
           (get_local $i)
           (i32.load)
-          (i32.const 0)
+          (get_global $null_char)
           (i32.eq)
           (if
               (then
@@ -29,12 +33,12 @@
           (i32.eq)
           (get_local $i)
           (i32.load)
-          (i32.const 0)
+          (get_global $null_char)
           (i32.ne)
           (i32.or)
           (br_if $iter)
 
-          (i32.const 4)
+          (get_global $size_i32)
           (get_local $i)
           (i32.add)
           (set_local $i)
@@ -44,18 +48,18 @@
 
  (func $find_free (param $i i32) (result i32)
        (get_local $i)
-       (i32.const 4)
+       (get_global $size_i32)
        (i32.mul)
        (set_local $i)
        (block $iter
          (loop
            (get_local $i)
            (i32.load)
-           (i32.const 0)
+           (get_global $null_char)
            (i32.eq)
            (br_if $iter)
 
-           (i32.const 4)
+           (get_global $size_i32)
            (get_local $i)
            (i32.add)
            (set_local $i)
@@ -81,7 +85,7 @@
 
           (set_local $return (i32.const -1))
 
-          (i32.const 4)
+          (get_global $size_i32)
           (get_local $i)
           (i32.add)
           (set_local $i)
@@ -91,26 +95,28 @@
 
  (func $create_list (result i32)
        (local $pointer i32)
-       (i32.const 4)
+       (get_global $size_i32)
        (i32.const 3)
        (i32.mul)
        (call $malloc)
        (set_local $pointer)
 
        (get_local $pointer)
-       (i32.const 100)
+       (get_global $list_start_char)
        (i32.store)
 
        (get_local $pointer)
-       (i32.const 4)
+       (get_global $size_i32)
        (i32.add)
-       (i32.const 200)
+       (get_global $list_end_char)
        (i32.store)
 
        (get_local $pointer)
-       (i32.const 8)
+       (get_global $size_i32)
+       (i32.const 2)
+       (i32.mul)
        (i32.add)
-       (i32.const 200)
+       (get_global $list_end_char)
        (i32.store)
 
        (get_local $pointer))

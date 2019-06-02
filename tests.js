@@ -139,7 +139,6 @@ class Test_create_list extends Test {
         this.test(i32[this.c], DELIMETERS.list_start);
         this.test(i32[this.c + 1], DELIMETERS.list_end);
         this.test(i32[this.c + 2], DELIMETERS.list_end);
-        window.mem = new Uint32Array(this.memory.buffer);
     }
 }
 
@@ -159,7 +158,6 @@ class Test_is_list_empty extends Test {
         for(let i = 0; i < spec.length; i++) {
             i32[i] = spec[i];
         }
-        window.mem = new Uint32Array(mem.buffer);
     }
 
     test_suite(exports) {

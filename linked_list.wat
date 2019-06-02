@@ -176,7 +176,10 @@
                (br 0)))))
        (get_local $return))
 
- (func $add_element (param $list_addr i32) (param $el i32) (result i32)
+ (func $add_element (param $list_addr i32)
+                    (param $el i32)
+                    (param $el_type i32)
+                    (result i32)
        (local $pointer i32)
        (get_local $list_addr)
        (call $is_list_empty)
@@ -185,7 +188,7 @@
             (get_local $list_addr)
             (get_global $size_i32)
             (i32.add)
-            (get_global $type_i32)
+            (get_local $el_type)
             (i32.store)
 
             (get_local $list_addr)
@@ -194,8 +197,7 @@
             (i32.mul)
             (i32.add)
             (get_local $el)
-            (i32.store)
-            )
+            (i32.store))
            (else
 
             (i32.const 3)
@@ -214,7 +216,7 @@
             (i32.store)
 
             (get_local $pointer)
-            (get_global $type_i32)
+            (get_local $el_type)
             (i32.store)
 
             (get_local $pointer)

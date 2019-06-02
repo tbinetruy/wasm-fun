@@ -6,7 +6,8 @@ const DELIMETERS = {
     null: 3000,
     list_start: 1000,
     list_end: 2000,
-    i32: 10,
+    type_i32: 1010,
+    type_object: 2010,
 };
 
 class Test {
@@ -35,7 +36,7 @@ class Test {
             list_start_char: DELIMETERS.list_start,
             list_end_char: DELIMETERS.list_end,
             null_char: DELIMETERS.null,
-            type_int: DELIMETERS.i32,
+            type_int: DELIMETERS.type_i32,
         };
         const importObject = { js: { mem: memory }, globals };
         const response = await fetch("linked_list.wasm");
@@ -154,7 +155,7 @@ class Test_is_list_empty extends Test {
             DELIMETERS.list_end,
             0,
             DELIMETERS.list_start,
-            DELIMETERS.i32,
+            DELIMETERS.type_i32,
             1,
             DELIMETERS.list_end,
         ];
@@ -178,24 +179,24 @@ class Test_find_last_element extends Test {
     init_mem(mem) {
         const spec = [
             DELIMETERS.list_start, // list starts
-            DELIMETERS.i32,        // cell type
+            DELIMETERS.type_i32,   // cell type
             15,                    // value
             5 * SIZE.i32,          // next address
             DELIMETERS.null,
-            DELIMETERS.i32,        // cell type
+            DELIMETERS.type_i32,   // cell type
             15,                    // value
             11 * SIZE.i32,         // next address
             DELIMETERS.null,
             DELIMETERS.null,
             DELIMETERS.null,
-            DELIMETERS.i32,        // cell type
+            DELIMETERS.type_i32,   // cell type
             15,                    // value
             DELIMETERS.list_end,   // list ends
             DELIMETERS.null,
             DELIMETERS.null,
             DELIMETERS.null,
             DELIMETERS.list_start, // list starts
-            DELIMETERS.i32,        // cell type
+            DELIMETERS.type_i32,   // cell type
             15,
             DELIMETERS.list_end,   // list ends
         ];
@@ -226,17 +227,17 @@ class Test_add_element extends Test {
         const { create_list, add_element } = exports;
         const list_addr = create_list();
         const el1 = 15;
-        this.test(add_element(list_addr, el1), list_addr);
+        this.test(add_element(list_addr, el1, DELIMETERS.type_i32), list_addr);
 
         let i32 = new Uint32Array(this.memory.buffer);
-        this.test(i32[list_addr / SIZE.i32 + 1], DELIMETERS.i32);
+        this.test(i32[list_addr / SIZE.i32 + 1], DELIMETERS.type_i32);
         this.test(i32[list_addr / SIZE.i32 + 2], el1);
         this.test(i32[list_addr / SIZE.i32 + 3], DELIMETERS.list_end);
 
         const el2 = 16;
-        add_element(list_addr, el2);
+        add_element(list_addr, el2, DELIMETERS.type_i32);
 
-        this.test(i32[this.d], DELIMETERS.i32);
+        this.test(i32[this.d], DELIMETERS.type_i32);
         this.test(i32[this.d + 1], el2);
         this.test(i32[this.d + 2], DELIMETERS.list_end);
     }
@@ -279,7 +280,7 @@ class Test_integration extends Test {
         const list_addr = create_list();
         const els = [1, 2, 5, 4, 3, 6, 7];
         for(let i = 0; i < els.length; i++) {
-            add_element(list_addr, els[i]);
+            add_element(list_addr, els[i], DELIMETERS.type_i32);
         }
         const list = this.read_list(list_addr);
         let flag = true;

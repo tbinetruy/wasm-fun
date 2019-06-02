@@ -60,7 +60,7 @@ class Test_find_free extends Test {
         this.offset = 4;
 
         for (let i = 0; i < 2*this.c + this.offset; i++) {
-            i32[i] = 0;
+            i32[i] = DELIMETERS.null;
         }
         for (let i = 0; i < this.c; i++) {
             i32[i] = 1;
@@ -88,7 +88,7 @@ class Test_check_free_space extends Test {
 
         var i32 = new Uint32Array(mem.buffer);
         for (let i = 0; i < this.d + this.offset; i++) {
-            i32[i] = 0;
+            i32[i] = DELIMETERS.null;
         }
         for (let i = 0; i < this.c; i++) {
             i32[i] = 1;
@@ -118,7 +118,7 @@ class Test_malloc extends Test {
 
         var i32 = new Uint32Array(mem.buffer);
         for (let i = 0; i < this.d + this.offset; i++) {
-            i32[i] = 0;
+            i32[i] = DELIMETERS.null;
         }
         for (let i = SIZE.i32; i < this.c; i++) {
             i32[i] = 1;

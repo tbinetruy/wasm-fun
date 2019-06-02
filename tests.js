@@ -2,6 +2,12 @@ const SIZE = {
     i32: 4,
 };
 
+const DELIMETERS = {
+    null: 0,
+    list_start: 100,
+    list_end: 200,
+};
+
 class Test {
     constructor() {
         this.test = this.test.bind(this);
@@ -130,6 +136,33 @@ class Test_malloc extends Test {
     }
 }
 
+class Test_create_list extends Test {
+    init_mem(mem) {
+        this.c = 10;
+        this.memory = mem;
+
+        let i32 = new Uint32Array(mem.buffer);
+        for (let i = 0; i < 2 * this.c; i++) {
+            i32[i] = DELIMETERS.null;
+        }
+        for (let i = 0; i < this.c; i++) {
+            i32[i] = 1;
+        }
+    }
+
+    test_suite(exports) {
+        const { create_list } = exports;
+        this.test(create_list(), this.c * SIZE.i32);
+
+        let i32 = new Uint32Array(this.memory.buffer);
+        this.test(i32[this.c], DELIMETERS.list_start);
+        this.test(i32[this.c + 1], DELIMETERS.list_end);
+        this.test(i32[this.c + 2], DELIMETERS.list_end);
+        window.mem = new Uint32Array(this.memory.buffer);
+    }
+}
+
 new Test_find_free();
 new Test_check_free_space();
 new Test_malloc();
+new Test_create_list();

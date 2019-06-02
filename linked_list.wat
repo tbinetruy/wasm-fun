@@ -90,9 +90,30 @@
        (get_local $return))
 
  (func $create_list (result i32)
-       i32.const 1
-       i32.const 1
-       i32.add)
+       (local $pointer i32)
+       (i32.const 4)
+       (i32.const 3)
+       (i32.mul)
+       (call $malloc)
+       (set_local $pointer)
+
+       (get_local $pointer)
+       (i32.const 100)
+       (i32.store)
+
+       (get_local $pointer)
+       (i32.const 4)
+       (i32.add)
+       (i32.const 200)
+       (i32.store)
+
+       (get_local $pointer)
+       (i32.const 8)
+       (i32.add)
+       (i32.const 200)
+       (i32.store)
+
+       (get_local $pointer))
 
  (func $add_element (param $el i32) (param $list i32) (result i32)
        get_local $el)

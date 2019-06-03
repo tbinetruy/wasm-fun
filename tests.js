@@ -3,9 +3,9 @@ const SIZE = {
 };
 
 const DELIMETERS = {
-    null: 3000,
     list_start: 1000,
     list_end: 2000,
+    null: 3000,
     type_i32: 1010,
     type_object: 2010,
 };
@@ -61,15 +61,15 @@ class Test {
     }
 
     get_mem() {
-        var memory = new WebAssembly.Memory({initial:1});
+        const memory = new WebAssembly.Memory({initial:1});
         this.init_mem(memory);
         return memory;
     }
 
     mem_quick_init(mem, [start, offset, end], start_offset = 0) {
-        let i32 = new Uint32Array(mem.buffer);
+        const i32 = new Uint32Array(mem.buffer);
 
-        for (let i = 0; i < 2 * end; i++) {
+        for (let i = 0; i < 20 * end; i++) {
             i32[i] = DELIMETERS.null;
         }
         for (let i = start_offset; i < start; i++) {
@@ -150,7 +150,7 @@ class Test_create_list_el extends Test {
         ) / SIZE.i32;
         this.test(list_el, this.c);
 
-        let i32 = new Uint32Array(this.memory.buffer);
+        const i32 = new Uint32Array(this.memory.buffer);
         this.test(i32[list_el], DELIMETERS.type_i32);
         this.test(i32[list_el + 1], value);
         this.test(i32[list_el + 2], DELIMETERS.list_end);
@@ -168,7 +168,7 @@ class Test_create_list extends Test {
         const { create_list } = exports;
         this.test(create_list(), this.c * SIZE.i32);
 
-        let i32 = new Uint32Array(this.memory.buffer);
+        const i32 = new Uint32Array(this.memory.buffer);
         this.test(i32[this.c], DELIMETERS.list_start);
         this.test(i32[this.c + 1], DELIMETERS.list_end);
         this.test(i32[this.c + 2], DELIMETERS.list_end);
@@ -191,7 +191,7 @@ class Test_is_list_empty extends Test {
             DELIMETERS.list_end,
         ];
 
-        let i32 = new Uint32Array(mem.buffer);
+        const i32 = new Uint32Array(mem.buffer);
         for(let i = 0; i < spec.length; i++) {
             i32[i] = spec[i];
         }
@@ -227,7 +227,7 @@ class Test_find_last_element extends Test {
             DELIMETERS.null,
         ];
 
-        let i32 = new Uint32Array(mem.buffer);
+        const i32 = new Uint32Array(mem.buffer);
         for(let i = 0; i < spec.length; i++) {
             i32[i] = spec[i];
         }
@@ -253,7 +253,7 @@ class Test_add_element extends Test {
         const el1 = 15;
         add_element(list_addr, el1, DELIMETERS.type_i32);
 
-        let i32 = new Uint32Array(this.memory.buffer);
+        const i32 = new Uint32Array(this.memory.buffer);
         const el1_addr = i32[list_addr / SIZE.i32 + 2];
 
         this.test(i32[list_addr / SIZE.i32], DELIMETERS.list_start);
@@ -288,7 +288,7 @@ class Test_integration extends Test {
         const list = [];
         addr = addr / SIZE.i32;
 
-        let i32 = new Uint32Array(this.memory.buffer);
+        const i32 = new Uint32Array(this.memory.buffer);
 
         if (i32[addr + 1] === DELIMETERS.list_end)
             return list;

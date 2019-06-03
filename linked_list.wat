@@ -123,32 +123,10 @@
        (get_local $pointer))
 
  (func $create_list (result i32)
-       (local $pointer i32)
-       (get_global $size_i32)
-       (i32.const 3)
-       (i32.mul)
-       (call $malloc)
-       (set_local $pointer)
-
-       (get_local $pointer)
        (get_global $list_start_char)
-       (i32.store)
-
-       (get_local $pointer)
-       (get_global $size_i32)
-       (i32.add)
        (get_global $list_end_char)
-       (i32.store)
-
-       (get_local $pointer)
-       (get_global $size_i32)
-       (i32.const 2)
-       (i32.mul)
-       (i32.add)
        (get_global $list_end_char)
-       (i32.store)
-
-       (get_local $pointer))
+       (call $create_list_el))
 
  (func $is_list_empty (param $list_addr i32) (result i32)
        (local $return i32)

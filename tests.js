@@ -11,14 +11,19 @@ const DELIMETERS = {
 };
 
 class Test {
-    constructor() {
+    constructor(docstring) {
         this.test = this.test.bind(this);
         this.load_wasm = this.load_wasm.bind(this);
         this.test_suite = this.test_suite.bind(this);
         this.init_mem = this.init_mem.bind(this);
         this.get_mem = this.get_mem.bind(this);
 
+        this.docstring = docstring;
         this.load_wasm();
+    }
+
+    debug() {
+        console.log("============");
     }
 
     test(a, b) {
@@ -43,6 +48,7 @@ class Test {
         const buffer = await response.arrayBuffer();
         const obj = await WebAssembly.instantiate(buffer, importObject);
 
+        console.log("============ " + this.docstring + " ============");
         this.test_suite(obj.instance.exports);
     }
 
@@ -320,11 +326,12 @@ class Test_integration extends Test {
     }
 }
 
-new Test_find_free();
-new Test_check_free_space();
-new Test_malloc();
-new Test_create_list();
-new Test_add_element();
-new Test_is_list_empty();
-new Test_find_last_element();
-new Test_integration();
+new Test_find_free("find_free");
+new Test_check_free_space("check_free_space");
+new Test_malloc("malloc");
+new Test_create_list_el("create_list_el");
+new Test_create_list("create_list");
+new Test_add_element("add_element");
+new Test_is_list_empty("is_list_empty");
+new Test_find_last_element("find_last_element");
+//new Test_integration("integration");

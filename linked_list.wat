@@ -148,6 +148,7 @@
  (func $find_last_element (param $list_addr i32) (result i32)
        (local $return i32)
        (local $pointer i32)
+       (set_local $pointer (get_local $list_addr))
        (get_local $list_addr)
        (call $is_list_empty)
        (if

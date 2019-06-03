@@ -145,6 +145,49 @@
             (set_local $return (i32.const 0))))
        (get_local $return))
 
+
+ (func $find_nth_element (param $list_addr i32) (param $el_num i32) (result i32)
+       (local $return i32)
+       (local $pointer i32)
+       (local $counter i32)
+       (set_local $pointer (get_local $list_addr))
+       (get_local $list_addr)
+       (call $is_list_empty)
+       (if
+           (then
+            (get_local $list_addr)
+            (set_local $return))
+           (else
+            (block $iter
+              (loop
+               (get_local $pointer)
+               (set_local $return)
+
+               (get_local $pointer)
+               (get_global $size_i32)
+               (i32.const 2)
+               (i32.mul)
+               (i32.add)
+               (i32.load)
+               (set_local $pointer)
+
+               (get_local $pointer)
+               (get_global $list_end_char)
+               (i32.eq)
+               (get_local $counter)
+               (get_local $el_num)
+               (i32.eq)
+               (i32.or)
+               (br_if $iter)
+
+               (get_local $counter)
+               (i32.const 1)
+               (i32.add)
+               (set_local $counter)
+
+               (br 0)))))
+       (get_local $return))
+
  (func $find_last_element (param $list_addr i32) (result i32)
        (local $return i32)
        (local $pointer i32)
@@ -204,6 +247,7 @@
  (export "find_free" (func $find_free))
  (export "create_list_el" (func $create_list_el))
  (export "malloc" (func $malloc))
+ (export "find_nth_element" (func $find_nth_element))
  (export "create_list" (func $create_list))
  (export "is_list_empty" (func $is_list_empty))
  (export "find_last_element" (func $find_last_element))

@@ -206,6 +206,44 @@ class Test_is_list_empty extends Test {
     }
 }
 
+
+class Test_find_nth_element extends Test {
+    init_mem(mem) {
+        const spec = [
+            DELIMETERS.list_start, // cell type
+            DELIMETERS.list_end,   // always list_end for list first cell
+            4 * SIZE.i32,          // next address
+            DELIMETERS.null,
+            DELIMETERS.type_i32,   // cell type
+            15,                    // value
+            10 * SIZE.i32,         // next address
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.type_i32,   // cell type
+            15,                    // value
+            DELIMETERS.list_end,   // list ends
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+        ];
+
+        const i32 = new Uint32Array(mem.buffer);
+        for(let i = 0; i < spec.length; i++) {
+            i32[i] = spec[i];
+        }
+    }
+
+    test_suite(exports) {
+        const { find_nth_element } = exports;
+        const list_addr = 0;
+        this.test(find_nth_element(list_addr, 0), 0);
+        this.test(find_nth_element(list_addr, 1), 4 * SIZE.i32);
+        this.test(find_nth_element(list_addr, 2), 10 * SIZE.i32);
+        this.test(find_nth_element(list_addr, 3), 10 * SIZE.i32);
+    }
+}
+
 class Test_find_last_element extends Test {
     init_mem(mem) {
         const spec = [
@@ -362,4 +400,5 @@ new Test_create_list("create_list");
 new Test_add_element("add_element");
 new Test_is_list_empty("is_list_empty");
 new Test_find_last_element("find_last_element");
+new Test_find_nth_element("find_nth_element");
 new Test_integration("integration");

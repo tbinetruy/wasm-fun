@@ -90,6 +90,38 @@
           (br 0)))
        (get_local $return))
 
+ (func $create_list_el (param $type i32)
+                       (param $value i32)
+                       (param $next_addr i32)
+                       (result i32)
+       (local $pointer i32)
+
+       (i32.const 3)
+       (get_global $size_i32)
+       (i32.mul)
+       (call $malloc)
+       (set_local $pointer)
+
+       (get_local $pointer)
+       (get_local $type)
+       (i32.store)
+
+       (get_local $pointer)
+       (get_global $size_i32)
+       (i32.add)
+       (get_local $value)
+       (i32.store)
+
+       (get_local $pointer)
+       (get_global $size_i32)
+       (i32.const 2)
+       (i32.mul)
+       (i32.add)
+       (get_local $next_addr)
+       (i32.store)
+
+       (get_local $pointer))
+
  (func $create_list (result i32)
        (local $pointer i32)
        (get_global $size_i32)
@@ -236,6 +268,7 @@
 
  (export "check_free_space" (func $check_free_space))
  (export "find_free" (func $find_free))
+ (export "create_list_el" (func $create_list_el))
  (export "malloc" (func $malloc))
  (export "create_list" (func $create_list))
  (export "is_list_empty" (func $is_list_empty))

@@ -127,6 +127,30 @@ class Test_malloc extends Test {
     }
 }
 
+class Test_create_list_el extends Test {
+    init_mem(mem) {
+        this.memory = mem;
+
+        this.mem_quick_init(mem, [10, 100, 300]);
+    }
+
+    test_suite(exports) {
+        const { create_list_el } = exports;
+        const value = 10;
+        const list_el = create_list_el(
+            DELIMETERS.type_i32,
+            value,
+            DELIMETERS.list_end,
+        );
+        this.test(list_el, this.c * SIZE.i32);
+
+        let i32 = new Uint32Array(this.memory.buffer);
+        this.test(i32[list_el], DELIMETERS.type_i32);
+        this.test(i32[list_el + 1], value);
+        this.test(i32[list_el + 2], DELIMETERS.list_end);
+    }
+}
+
 class Test_create_list extends Test {
     init_mem(mem) {
         this.memory = mem;

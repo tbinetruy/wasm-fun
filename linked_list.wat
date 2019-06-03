@@ -216,10 +216,30 @@
 
        (get_local $list_addr))
 
+ (func $concat (param $listA_addr i32) (param $listB_addr i32) (result i32)
+       (get_local $listA_addr)
+       (call $find_last_element)
+       (get_global $size_i32)
+       (i32.const 2)
+       (i32.mul)
+       (i32.add)
+
+       (get_local $listB_addr)
+       (get_global $size_i32)
+       (i32.const 2)
+       (i32.mul)
+       (i32.add)
+       (i32.load)
+
+       (i32.store)
+
+       (get_local $listA_addr))
+
  (export "check_free_space" (func $check_free_space))
  (export "find_free" (func $find_free))
  (export "create_list_el" (func $create_list_el))
  (export "malloc" (func $malloc))
+ (export "concat" (func $concat))
  (export "find_nth_element" (func $find_nth_element))
  (export "create_list" (func $create_list))
  (export "is_list_empty" (func $is_list_empty))

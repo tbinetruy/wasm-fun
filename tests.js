@@ -22,7 +22,38 @@ class Test {
         this.load_wasm();
     }
 
+    read_list(addr) {
+        const list = [];
+        addr = addr / SIZE.i32;
+
+        const i32 = new Uint32Array(this.memory.buffer);
+
+        const next_addr = i32[addr + 2];
+        if (next_addr === DELIMETERS.list_end)
+            return list;
+
+        addr = next_addr / SIZE.i32;
+        do {
+            const type = i32[addr];
+            const value = i32[addr + 1];
+            const next_addr = i32[addr + 2];
+
+            if (type === DELIMETERS.type_object)
+                list.push(this.read_list(value));
+            else
+                list.push(value);
+
+            if (next_addr === DELIMETERS.list_end) {
+                return list;
+            }
+            addr = next_addr / SIZE.i32;
+        } while(1);
+
+        return -1;
+    }
+
     debug() {
+        window.mem = new Uint32Array(this.memory.buffer);
         console.log("============");
     }
 
@@ -63,6 +94,7 @@ class Test {
     get_mem() {
         const memory = new WebAssembly.Memory({initial:1});
         this.init_mem(memory);
+        this.memory = memory;
         return memory;
     }
 
@@ -315,7 +347,43 @@ class Test_add_element extends Test {
     }
 }
 
-class Test_integration extends Test {
+
+class Test_concat extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 1, 20], 5);
+    }
+
+    test_suite(exports) {
+        const { create_list, add_element, concat } = exports;
+        let els1 = [1, 2, 5, 4, 3, 6, 7];
+        let els2 = [10, 20, 50, 40, 30, 60, 70];
+
+        const list_addr1 = create_list();
+        for(let i = 0; i < els1.length; i++) {
+            add_element(list_addr1, els1[i], DELIMETERS.type_i32);
+        }
+
+        const list_addr2 = create_list();
+        for(let i = 0; i < els2.length; i++) {
+            add_element(list_addr2, els2[i], DELIMETERS.type_i32);
+        }
+
+        let list1 = this.read_list(list_addr1);
+        let list2 = this.read_list(list_addr2);
+        this.test(JSON.stringify(els1), JSON.stringify(list1));
+        this.test(JSON.stringify(els2), JSON.stringify(list2));
+
+        concat(list_addr1, list_addr2);
+
+        list1 = this.read_list(list_addr1);
+        list2 = this.read_list(list_addr2);
+        this.test(JSON.stringify(els1.concat(els2)), JSON.stringify(list1));
+        this.test(JSON.stringify(els2), JSON.stringify(list2));
+    }
+}
+
+
+class Test_nested extends Test {
     init_mem(mem) {
         this.memory = mem;
 
@@ -329,40 +397,9 @@ class Test_integration extends Test {
         }
     }
 
-    read_list(addr) {
-        const list = [];
-        addr = addr / SIZE.i32;
-
-        const i32 = new Uint32Array(this.memory.buffer);
-
-        const next_addr = i32[addr + 2];
-        if (next_addr === DELIMETERS.list_end)
-            return list;
-
-        addr = next_addr / SIZE.i32;
-        do {
-            const type = i32[addr];
-            const value = i32[addr + 1];
-            const next_addr = i32[addr + 2];
-
-            if (type === DELIMETERS.type_object)
-                list.push(this.read_list(value));
-            else
-                list.push(value);
-
-            if (next_addr === DELIMETERS.list_end) {
-                return list;
-            }
-            addr = next_addr / SIZE.i32;
-        } while(1);
-
-        return -1;
-    }
-
     test_suite(exports) {
-        window.mem = new Uint32Array(this.memory.buffer);
         const { create_list, add_element } = exports;
-        let els = [1,2, 2, 5, 4, 3, 6, 7];
+        const els = [1, 2, 5, 4, 3, 6, 7];
 
         const list_addr = create_list();
         for(let i = 0; i < els.length; i++) {
@@ -378,17 +415,11 @@ class Test_integration extends Test {
             add_element(list_addr2, els[i], DELIMETERS.type_i32);
         }
 
-        let flag = true;
-        for(let i = 0; i < els.length; i++) {
-            if(list_addr[i] !== els[i])
-                flag = false;
-        }
-        this.test(flag, true);
-
-        let list = this.read_list(list_addr);
+        const list = this.read_list(list_addr);
         const list2 = this.read_list(list_addr2);
-        console.log(list);
-        console.log(list2);
+
+        this.test(JSON.stringify(els), JSON.stringify(list));
+        this.test(JSON.stringify(els.concat([els]).concat(els)), JSON.stringify(list2));
     }
 }
 
@@ -401,4 +432,5 @@ new Test_add_element("add_element");
 new Test_is_list_empty("is_list_empty");
 new Test_find_last_element("find_last_element");
 new Test_find_nth_element("find_nth_element");
-new Test_integration("integration");
+new Test_nested("nested lists");
+new Test_concat("concat");

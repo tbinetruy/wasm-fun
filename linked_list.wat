@@ -189,36 +189,9 @@
        (get_local $return))
 
  (func $find_last_element (param $list_addr i32) (result i32)
-       (local $return i32)
-       (local $pointer i32)
-       (set_local $pointer (get_local $list_addr))
        (get_local $list_addr)
-       (call $is_list_empty)
-       (if
-           (then
-            (get_local $list_addr)
-            (set_local $return))
-           (else
-            (block $iter
-              (loop
-               (get_local $pointer)
-               (set_local $return)
-
-               (get_local $pointer)
-               (get_global $size_i32)
-               (i32.const 2)
-               (i32.mul)
-               (i32.add)
-               (i32.load)
-               (set_local $pointer)
-
-               (get_local $pointer)
-               (get_global $list_end_char)
-               (i32.eq)
-               (br_if $iter)
-
-               (br 0)))))
-       (get_local $return))
+       (get_global $list_end_char)
+       (call $find_nth_element))
 
  (func $add_element (param $list_addr i32)
                     (param $el i32)

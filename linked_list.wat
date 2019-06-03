@@ -182,10 +182,10 @@
                     (result i32)
        (local $pointer i32)
 
-       (i32.const 3)
-       (get_global $size_i32)
-       (i32.mul)
-       (call $malloc)
+       (get_local $el_type)
+       (get_local $el)
+       (get_global $list_end_char)
+       (call $create_list_el)
        (set_local $pointer)
 
        (get_local $list_addr)
@@ -196,25 +196,6 @@
        (i32.add)
        (get_local $pointer)
        (i32.store)
-
-       (get_local $pointer)
-       (get_local $el_type)
-       (i32.store)
-
-       (get_local $pointer)
-       (get_global $size_i32)
-       (i32.add)
-       (get_local $el)
-       (i32.store)
-
-       (get_local $pointer)
-       (get_global $size_i32)
-       (i32.const 2)
-       (i32.mul)
-       (i32.add)
-       (get_global $list_end_char)
-       (i32.store)
-
 
        (get_local $list_addr))
 

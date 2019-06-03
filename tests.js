@@ -281,7 +281,14 @@ class Test_integration extends Test {
     init_mem(mem) {
         this.memory = mem;
 
-        this.mem_quick_init(mem, [10, 1, 20], 4);
+        const i32 = new Uint32Array(mem.buffer);
+
+        for (let i = 0; i < 2000; i++) {
+            i32[i] = DELIMETERS.null;
+        }
+        for (let i = 0; i < 10; i++) {
+            i32[i] = 1;
+        }
     }
 
     read_list(addr) {
@@ -290,19 +297,24 @@ class Test_integration extends Test {
 
         const i32 = new Uint32Array(this.memory.buffer);
 
-        if (i32[addr + 1] === DELIMETERS.list_end)
+        const next_addr = i32[addr + 2];
+        if (next_addr === DELIMETERS.list_end)
             return list;
-        else if (i32[addr + 3] === DELIMETERS.list_end)
-            return [i32[addr + 2]];
 
-        addr += 1;
+        addr = next_addr / SIZE.i32;
         do {
             const type = i32[addr];
             const value = i32[addr + 1];
             const next_addr = i32[addr + 2];
-            list.push(value);
-            if (next_addr === DELIMETERS.list_end)
+
+            if (type === DELIMETERS.type_object)
+                list.push(this.read_list(value));
+            else
+                list.push(value);
+
+            if (next_addr === DELIMETERS.list_end) {
                 return list;
+            }
             addr = next_addr / SIZE.i32;
         } while(1);
 
@@ -310,19 +322,35 @@ class Test_integration extends Test {
     }
 
     test_suite(exports) {
+        window.mem = new Uint32Array(this.memory.buffer);
         const { create_list, add_element } = exports;
+        let els = [1,2, 2, 5, 4, 3, 6, 7];
+
         const list_addr = create_list();
-        const els = [1, 2, 5, 4, 3, 6, 7];
         for(let i = 0; i < els.length; i++) {
             add_element(list_addr, els[i], DELIMETERS.type_i32);
         }
-        const list = this.read_list(list_addr);
+
+        const list_addr2 = create_list();
+        for(let i = 0; i < els.length; i++) {
+            add_element(list_addr2, els[i], DELIMETERS.type_i32);
+        }
+        add_element(list_addr2, list_addr, DELIMETERS.type_object);
+        for(let i = 0; i < els.length; i++) {
+            add_element(list_addr2, els[i], DELIMETERS.type_i32);
+        }
+
         let flag = true;
         for(let i = 0; i < els.length; i++) {
-            if(list[i] !== els[i])
+            if(list_addr[i] !== els[i])
                 flag = false;
         }
         this.test(flag, true);
+
+        let list = this.read_list(list_addr);
+        const list2 = this.read_list(list_addr2);
+        console.log(list);
+        console.log(list2);
     }
 }
 
@@ -334,4 +362,4 @@ new Test_create_list("create_list");
 new Test_add_element("add_element");
 new Test_is_list_empty("is_list_empty");
 new Test_find_last_element("find_last_element");
-//new Test_integration("integration");
+new Test_integration("integration");

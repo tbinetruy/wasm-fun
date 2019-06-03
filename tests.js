@@ -184,7 +184,7 @@ class Test_is_list_empty extends Test {
             0,
             0,
             DELIMETERS.list_start,
-            DELIMETERS.undefined,
+            DELIMETERS.list_end,
             8,
             DELIMETERS.type_i32,
             1,
@@ -200,7 +200,7 @@ class Test_is_list_empty extends Test {
     test_suite(exports) {
         const { create_list, is_list_empty } = exports;
         const list1_addr = 0;
-        const list2_addr = 8 * SIZE.i32;
+        const list2_addr = 5 * SIZE.i32;
         this.test(is_list_empty(list1_addr), 1);
         this.test(is_list_empty(list2_addr), 0);
     }
@@ -210,7 +210,7 @@ class Test_find_last_element extends Test {
     init_mem(mem) {
         const spec = [
             DELIMETERS.list_start, // cell type
-            DELIMETERS.undefined,  // always undef for list first cell
+            DELIMETERS.list_end,   // always list_end for list first cell
             4 * SIZE.i32,          // next address
             DELIMETERS.null,
             DELIMETERS.type_i32,   // cell type

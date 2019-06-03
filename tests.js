@@ -141,8 +141,8 @@ class Test_create_list_el extends Test {
             DELIMETERS.type_i32,
             value,
             DELIMETERS.list_end,
-        );
-        this.test(list_el, this.c * SIZE.i32);
+        ) / SIZE.i32;
+        this.test(list_el, this.c);
 
         let i32 = new Uint32Array(this.memory.buffer);
         this.test(i32[list_el], DELIMETERS.type_i32);
@@ -166,7 +166,6 @@ class Test_create_list extends Test {
         this.test(i32[this.c], DELIMETERS.list_start);
         this.test(i32[this.c + 1], DELIMETERS.list_end);
         this.test(i32[this.c + 2], DELIMETERS.list_end);
-        this.test(i32[this.c + 3], DELIMETERS.list_end);
     }
 }
 
@@ -176,9 +175,11 @@ class Test_is_list_empty extends Test {
             DELIMETERS.list_start,
             DELIMETERS.list_end,
             DELIMETERS.list_end,
-            DELIMETERS.list_end,
+            0,
             0,
             DELIMETERS.list_start,
+            DELIMETERS.undefined,
+            8,
             DELIMETERS.type_i32,
             1,
             DELIMETERS.list_end,
@@ -193,7 +194,7 @@ class Test_is_list_empty extends Test {
     test_suite(exports) {
         const { create_list, is_list_empty } = exports;
         const list1_addr = 0;
-        const list2_addr = 4 * SIZE.i32;
+        const list2_addr = 8 * SIZE.i32;
         this.test(is_list_empty(list1_addr), 1);
         this.test(is_list_empty(list2_addr), 0);
     }
@@ -202,14 +203,13 @@ class Test_is_list_empty extends Test {
 class Test_find_last_element extends Test {
     init_mem(mem) {
         const spec = [
-            DELIMETERS.list_start, // list starts
-            DELIMETERS.type_i32,   // cell type
-            15,                    // value
-            5 * SIZE.i32,          // next address
+            DELIMETERS.list_start, // cell type
+            DELIMETERS.undefined,  // always undef for list first cell
+            4 * SIZE.i32,          // next address
             DELIMETERS.null,
             DELIMETERS.type_i32,   // cell type
             15,                    // value
-            11 * SIZE.i32,         // next address
+            10 * SIZE.i32,         // next address
             DELIMETERS.null,
             DELIMETERS.null,
             DELIMETERS.null,
@@ -219,10 +219,6 @@ class Test_find_last_element extends Test {
             DELIMETERS.null,
             DELIMETERS.null,
             DELIMETERS.null,
-            DELIMETERS.list_start, // list starts
-            DELIMETERS.type_i32,   // cell type
-            15,
-            DELIMETERS.list_end,   // list ends
         ];
 
         let i32 = new Uint32Array(mem.buffer);
@@ -233,10 +229,8 @@ class Test_find_last_element extends Test {
 
     test_suite(exports) {
         const { find_last_element } = exports;
-        const list1_addr = 0;
-        const list2_addr = 17 * SIZE.i32;
-        this.test(find_last_element(list1_addr), 11 * SIZE.i32);
-        this.test(find_last_element(list2_addr), list2_addr + SIZE.i32);
+        const list_addr = 0;
+        this.test(find_last_element(list_addr), 10 * SIZE.i32);
     }
 }
 
@@ -251,19 +245,29 @@ class Test_add_element extends Test {
         const { create_list, add_element } = exports;
         const list_addr = create_list();
         const el1 = 15;
-        this.test(add_element(list_addr, el1, DELIMETERS.type_i32), list_addr);
+        add_element(list_addr, el1, DELIMETERS.type_i32);
 
         let i32 = new Uint32Array(this.memory.buffer);
-        this.test(i32[list_addr / SIZE.i32 + 1], DELIMETERS.type_i32);
-        this.test(i32[list_addr / SIZE.i32 + 2], el1);
-        this.test(i32[list_addr / SIZE.i32 + 3], DELIMETERS.list_end);
+        const el1_addr = i32[list_addr / SIZE.i32 + 2];
+
+        this.test(i32[list_addr / SIZE.i32], DELIMETERS.list_start);
+        this.test(i32[list_addr / SIZE.i32 + 1], DELIMETERS.list_end);
+        this.test(i32[list_addr / SIZE.i32 + 2], el1_addr);
+
+        this.test(i32[el1_addr / SIZE.i32], DELIMETERS.type_i32);
+        this.test(i32[el1_addr / SIZE.i32 + 1], el1);
+        this.test(i32[el1_addr / SIZE.i32 + 2], DELIMETERS.list_end);
 
         const el2 = 16;
         add_element(list_addr, el2, DELIMETERS.type_i32);
+        const el2_addr = i32[el1_addr / SIZE.i32 + 2];
 
-        this.test(i32[this.d], DELIMETERS.type_i32);
-        this.test(i32[this.d + 1], el2);
-        this.test(i32[this.d + 2], DELIMETERS.list_end);
+        this.test(i32[el1_addr / SIZE.i32 + 2], el2_addr);
+
+        this.test(i32[el2_addr / SIZE.i32], DELIMETERS.type_i32);
+        this.test(i32[el2_addr / SIZE.i32 + 1], el2);
+        this.test(i32[el2_addr / SIZE.i32 + 2], DELIMETERS.list_end);
+
     }
 }
 

@@ -476,8 +476,7 @@ class Test_add_to_rc_tab extends Test {
     }
 }
 
-        console.log("foo");
-        this.debug();
+
 class Test_car_cdr_addr extends Test {
     init_mem(mem) {
         this.mem_quick_init(mem, [10, 10, 20]);

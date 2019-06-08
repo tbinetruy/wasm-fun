@@ -494,6 +494,82 @@ class Test_car_cdr_addr extends Test {
     }
 }
 
+
+class Test_find_value_in_alist_from_key extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20]);
+    }
+
+    setup_rc_table(exports) {
+        const {
+            add_element,
+            create_list,
+            car,
+            find_value_in_alist_from_key,
+        } = exports;
+        const sublist1_addr = create_list();
+        const [key1, value1] = [1, 2];
+        const [key2, value2] = [3, 4];
+        add_element(sublist1_addr, key1, DELIMETERS.type_i32);
+        add_element(sublist1_addr, value1, DELIMETERS.type_i32);
+        const sublist2_addr = create_list();
+        add_element(sublist2_addr, key2, DELIMETERS.type_i32);
+        add_element(sublist2_addr, value2, DELIMETERS.type_i32);
+        const alist_addr = create_list();
+        add_element(alist_addr, sublist1_addr, DELIMETERS.type_object);
+        add_element(alist_addr, sublist2_addr, DELIMETERS.type_object);
+        return [alist_addr, key1, value1, key2, value2];
+    }
+
+    test_suite(exports) {
+        const {
+            car,
+            find_value_in_alist_from_key,
+        } = exports;
+
+        const [alist_addr, key1, value1, key2, value2] = this.setup_rc_table(exports);
+        this.test(
+            car(find_value_in_alist_from_key(alist_addr, key1)),
+            value1,
+        );
+        this.test(
+            car(find_value_in_alist_from_key(alist_addr, key2)),
+            value2,
+        );
+    }
+}
+
+class Test_increase_rc extends Test_find_value_in_alist_from_key {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20]);
+    }
+
+    test_suite(exports) {
+        const {
+            car,
+            find_value_in_alist_from_key,
+            increase_rc,
+            decrease_rc,
+        } = exports;
+
+        const [alist_addr, key1, value1, key2, value2] = this.setup_rc_table(exports);
+
+        decrease_rc(alist_addr, key1);
+        increase_rc(alist_addr, key2);
+
+        this.test(
+            car(find_value_in_alist_from_key(alist_addr, key1)),
+            value1 - 1,
+        );
+        this.test(
+            car(find_value_in_alist_from_key(alist_addr, key2)),
+            value2 + 1,
+        );
+    }
+}
+
 new Test_free("free");
+new Test_increase_rc("increase_decrease_rc");
+new Test_find_value_in_alist_from_key("find_value_in_alist_from_key");
 new Test_add_to_rc_tab("add_to_rc_tab");
 new Test_car_cdr_addr("car_addr and cd_addr");

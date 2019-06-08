@@ -5,6 +5,7 @@
  (global $list_end_char (import "globals" "list_end_char") i32)
  (global $null_char (import "globals" "null_char") i32)
  (global $type_i32 (import "globals" "type_int") i32)
+ (global $type_object (import "globals" "type_object") i32)
 
  (func $check_free_space (param $start i32) (param $length i32) (result i32)
        (local $i i32)
@@ -259,12 +260,36 @@
 
           (br 0))))
 
+ (func $add_to_rc_tab (param $tab_addr i32) (param $el_addr i32)
+       (local $list_pointer i32)
+       (call $create_list)
+       (set_local $list_pointer)
+
+       (get_local $list_pointer)
+       (get_local $el_addr)
+       (get_global $type_object)
+       (call $add_element)
+       (drop)
+
+       (get_local $list_pointer)
+       (i32.const 0)
+       (get_global $type_i32)
+       (call $add_element)
+       (drop)
+
+       (get_local $tab_addr)
+       (get_local $list_pointer)
+       (get_global $type_object)
+       (call $add_element)
+       (drop))
+
 
  (export "check_free_space" (func $check_free_space))
  (export "find_free" (func $find_free))
  (export "create_list_el" (func $create_list_el))
  (export "free" (func $free))
  (export "malloc" (func $malloc))
+ (export "add_to_rc_tab" (func $add_to_rc_tab))
  (export "concat" (func $concat))
  (export "find_nth_element" (func $find_nth_element))
  (export "create_list" (func $create_list))

@@ -73,6 +73,7 @@ class Test {
             list_end_char: DELIMETERS.list_end,
             null_char: DELIMETERS.null,
             type_int: DELIMETERS.type_i32,
+            type_object: DELIMETERS.type_object,
         };
         const importObject = { js: { mem: memory }, globals };
         const response = await fetch("linked_list.wasm");
@@ -453,6 +454,23 @@ class Test_free extends Test {
         for(let i = 0; i < c; i++)
             this.test(i32[start_addr + i], DELIMETERS.null);
         this.test(i32[start_addr + c], 1);
+class Test_add_to_rc_tab extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20]);
+    }
+
+    test_suite(exports) {
+        const { create_list, add_to_rc_tab, find_nth_element, car } = exports;
+        const ref_count_tab_addr = create_list();
+        const el_addr = 10 * SIZE.i32;
+        add_to_rc_tab(ref_count_tab_addr, el_addr);
+
+        const first_el_addr = car(find_nth_element(ref_count_tab_addr, 1));
+
+        this.test(car(find_nth_element(first_el_addr, 1)), el_addr);
+        this.test(car(find_nth_element(first_el_addr, 2)), 0);
+    }
+}
 
         console.log("foo");
         this.debug();
@@ -460,3 +478,4 @@ class Test_free extends Test {
 }
 
 new Test_free("free");
+new Test_add_to_rc_tab("add_to_rc_tab");

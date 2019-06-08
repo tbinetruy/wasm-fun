@@ -235,9 +235,35 @@
 
        (get_local $listA_addr))
 
+ (func $free (param $addr i32) (param $length i32)
+       (local $pointer i32)
+       (get_local $addr)
+       (set_local $pointer)
+       (block $iter
+         (loop
+          (get_local $pointer)
+          (get_local $addr)
+          (i32.sub)
+          (get_local $length)
+          (i32.ge_s)
+          (br_if $iter)
+
+          (get_local $pointer)
+          (get_global $null_char)
+          (i32.store)
+
+          (get_local $pointer)
+          (get_global $size_i32)
+          (i32.add)
+          (set_local $pointer)
+
+          (br 0))))
+
+
  (export "check_free_space" (func $check_free_space))
  (export "find_free" (func $find_free))
  (export "create_list_el" (func $create_list_el))
+ (export "free" (func $free))
  (export "malloc" (func $malloc))
  (export "concat" (func $concat))
  (export "find_nth_element" (func $find_nth_element))

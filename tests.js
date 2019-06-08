@@ -434,3 +434,29 @@ new Test_find_last_element("find_last_element");
 new Test_find_nth_element("find_nth_element");
 new Test_nested("nested lists");
 new Test_concat("concat");
+
+class Test_free extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20]);
+    }
+
+    test_suite(exports) {
+        const { free } = exports;
+
+        const start_addr = 2;
+        const c = 3;
+        free(start_addr * SIZE.i32, c * SIZE.i32);
+
+        const i32 = new Uint32Array(this.memory.buffer);
+
+        this.test(i32[start_addr - 1], 1);
+        for(let i = 0; i < c; i++)
+            this.test(i32[start_addr + i], DELIMETERS.null);
+        this.test(i32[start_addr + c], 1);
+
+        console.log("foo");
+        this.debug();
+    }
+}
+
+new Test_free("free");

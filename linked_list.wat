@@ -382,6 +382,16 @@
       (i32.const 1)
       (i32.sub)
       (i32.store))
+ (func $create_gc_list (param $tab_addr i32) (result i32)
+       (local $pointer i32)
+       (call $create_list)
+       (set_local $pointer)
+
+       (get_local $tab_addr)
+       (get_local $pointer)
+       (call $add_to_rc_tab)
+
+       (get_local $pointer))
 
  (export "check_free_space" (func $check_free_space))
  (export "find_free" (func $find_free))
@@ -394,6 +404,7 @@
  (export "find_value_in_alist_from_key" (func $find_value_in_alist_from_key))
  (export "decrease_rc" (func $decrease_rc))
  (export "increase_rc" (func $increase_rc))
+ (export "create_gc_list" (func $create_gc_list))
  (export "malloc" (func $malloc))
  (export "add_to_rc_tab" (func $add_to_rc_tab))
  (export "concat" (func $concat))

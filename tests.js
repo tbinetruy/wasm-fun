@@ -568,6 +568,32 @@ class Test_increase_rc extends Test_find_value_in_alist_from_key {
     }
 }
 
+class Test_create_gc_list extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20], 100);
+    }
+
+    test_suite(exports) {
+        const {
+            create_list,
+            create_gc_list,
+            car,
+            cdr,
+            find_value_in_alist_from_key,
+        } = exports;
+
+        const rc_table = create_list();
+        const gc_list = create_gc_list(rc_table);
+
+        this.test(
+            car(find_value_in_alist_from_key(rc_table, gc_list)),
+            0,
+        );
+        this.test(cdr(gc_list), DELIMETERS.list_end);
+    }
+}
+
+new Test_create_gc_list("create_gc_list");
 new Test_free("free");
 new Test_increase_rc("increase_decrease_rc");
 new Test_find_value_in_alist_from_key("find_value_in_alist_from_key");

@@ -284,10 +284,36 @@
        (drop))
 
 
+ (func $car_addr (param $el_addr i32) (result i32)
+       (get_local $el_addr)
+       (get_global $size_i32)
+       (i32.add))
+
+ (func $car (param $el_addr i32) (result i32)
+       (get_local $el_addr)
+       (call $car_addr)
+       (i32.load))
+
+(func $cdr_addr (param $el_addr i32) (result i32)
+       (get_local $el_addr)
+       (get_global $size_i32)
+       (i32.const 2)
+       (i32.mul)
+       (i32.add))
+
+(func $cdr (param $el_addr i32) (result i32)
+      (get_local $el_addr)
+      (call $cdr_addr)
+      (i32.load))
+
  (export "check_free_space" (func $check_free_space))
  (export "find_free" (func $find_free))
  (export "create_list_el" (func $create_list_el))
  (export "free" (func $free))
+ (export "car" (func $car))
+ (export "cdr" (func $cdr))
+ (export "car_addr" (func $car_addr))
+ (export "cdr_addr" (func $cdr_addr))
  (export "malloc" (func $malloc))
  (export "add_to_rc_tab" (func $add_to_rc_tab))
  (export "concat" (func $concat))

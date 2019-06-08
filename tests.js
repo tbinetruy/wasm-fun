@@ -454,6 +454,10 @@ class Test_free extends Test {
         for(let i = 0; i < c; i++)
             this.test(i32[start_addr + i], DELIMETERS.null);
         this.test(i32[start_addr + c], 1);
+    }
+}
+
+
 class Test_add_to_rc_tab extends Test {
     init_mem(mem) {
         this.mem_quick_init(mem, [10, 10, 20]);
@@ -474,8 +478,23 @@ class Test_add_to_rc_tab extends Test {
 
         console.log("foo");
         this.debug();
+class Test_car_cdr_addr extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20]);
+    }
+
+    test_suite(exports) {
+        const { create_list_el, car_addr, cdr_addr, car, cdr } = exports;
+        const [type, value, next_addr] = [1, 2, 3];
+        const el_addr = create_list_el(type, value, next_addr);
+
+        this.test(car_addr(el_addr), el_addr + SIZE.i32);
+        this.test(cdr_addr(el_addr), el_addr + 2 * SIZE.i32);
+        this.test(car(el_addr), value);
+        this.test(cdr(el_addr), next_addr);
     }
 }
 
 new Test_free("free");
 new Test_add_to_rc_tab("add_to_rc_tab");
+new Test_car_cdr_addr("car_addr and cd_addr");

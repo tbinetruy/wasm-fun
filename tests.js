@@ -594,8 +594,33 @@ class Test_create_gc_list extends Test {
     }
 }
 
+class Test_free_list_el extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20], 100);
+    }
+
+    test_suite(exports) {
+        const {
+            create_list_el,
+            free_list_el,
+            car,
+            cdr,
+            get_type,
+        } = exports;
+
+        const [type, value, next_addr] = [1, 2, 3];
+        const list_el_addr = create_list_el(type, value, next_addr);
+
+        this.test(free_list_el(list_el_addr), next_addr);
+        this.test(get_type(list_el_addr), DELIMETERS.null);
+        this.test(car(list_el_addr), DELIMETERS.null);
+        this.test(cdr(list_el_addr), DELIMETERS.null);
+    }
+}
+
 new Test_create_gc_list("create_gc_list");
 new Test_free("free");
+new Test_free_list_el("free_list_el");
 new Test_increase_rc("increase_decrease_rc");
 new Test_find_value_in_alist_from_key("find_value_in_alist_from_key");
 new Test_add_to_rc_tab("add_to_rc_tab");

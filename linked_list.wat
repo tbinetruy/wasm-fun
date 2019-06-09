@@ -397,10 +397,24 @@
 
        (get_local $pointer))
 
+ (func $free_list_el (param $el_addr i32) (result i32)
+       (local $pointer i32)
+       (get_local $el_addr)
+       (call $cdr)
+       (set_local $pointer)
+
+       (get_local $el_addr)
+       (get_global $size_i32)
+       (i32.const 3)
+       (i32.mul)
+       (call $free)
+
+       (get_local $pointer))
  (export "check_free_space" (func $check_free_space))
  (export "find_free" (func $find_free))
  (export "create_list_el" (func $create_list_el))
  (export "free" (func $free))
+ (export "free_list_el" (func $free_list_el))
  (export "get_type" (func $get_type))
  (export "car" (func $car))
  (export "cdr" (func $cdr))

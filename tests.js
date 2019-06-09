@@ -477,13 +477,13 @@ class Test_add_to_rc_tab extends Test {
 }
 
 
-class Test_car_cdr_addr extends Test {
+class Test_car_cdr_get_type extends Test {
     init_mem(mem) {
         this.mem_quick_init(mem, [10, 10, 20]);
     }
 
     test_suite(exports) {
-        const { create_list_el, car_addr, cdr_addr, car, cdr } = exports;
+        const { create_list_el, car_addr, cdr_addr, car, cdr, get_type } = exports;
         const [type, value, next_addr] = [1, 2, 3];
         const el_addr = create_list_el(type, value, next_addr);
 
@@ -491,6 +491,7 @@ class Test_car_cdr_addr extends Test {
         this.test(cdr_addr(el_addr), el_addr + 2 * SIZE.i32);
         this.test(car(el_addr), value);
         this.test(cdr(el_addr), next_addr);
+        this.test(get_type(el_addr), type);
     }
 }
 
@@ -598,4 +599,4 @@ new Test_free("free");
 new Test_increase_rc("increase_decrease_rc");
 new Test_find_value_in_alist_from_key("find_value_in_alist_from_key");
 new Test_add_to_rc_tab("add_to_rc_tab");
-new Test_car_cdr_addr("car_addr and cd_addr");
+new Test_car_cdr_get_type("car, cdr, get_type");

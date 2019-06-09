@@ -283,6 +283,9 @@
        (call $add_element)
        (drop))
 
+ (func $get_type (param $el_addr i32) (result i32)
+       (get_local $el_addr)
+       (i32.load))
 
  (func $car_addr (param $el_addr i32) (result i32)
        (get_local $el_addr)
@@ -398,6 +401,7 @@
  (export "find_free" (func $find_free))
  (export "create_list_el" (func $create_list_el))
  (export "free" (func $free))
+ (export "get_type" (func $get_type))
  (export "car" (func $car))
  (export "cdr" (func $cdr))
  (export "car_addr" (func $car_addr))

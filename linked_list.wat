@@ -410,6 +410,55 @@
        (call $free)
 
        (get_local $pointer))
+
+
+ (func $free_gc_list (param $tab_addr i32) (param $list_addr i32)
+       (local $pointer i32)
+       (local $next_addr i32)
+       (get_local $list_addr)
+       (set_local $pointer)
+       (block $iter
+         (loop
+          (get_local $pointer)
+          (call $get_type)
+          (get_global $type_object)
+          (i32.eq)
+          (if
+              (then
+               (get_local $tab_addr)
+               (get_local $pointer)
+               (call $car)
+               (call $decrease_rc)
+
+               (get_local $tab_addr)
+               (get_local $pointer)
+               (call $car)
+               (call $find_value_in_alist_from_key)
+               (call $car)
+               (i32.const 0)
+               (i32.eq)
+               (if
+                   (then
+                    (get_local $tab_addr)
+                    (get_local $pointer)
+                    (call $car)
+                    (call $free_gc_list)))))
+
+          (get_local $pointer)
+          (call $free_list_el)
+          (set_local $next_addr)
+
+          (get_local $next_addr)
+          (get_global $list_end_char)
+          (i32.eq)
+          (br_if $iter)
+
+          (get_local $next_addr)
+          (set_local $pointer)
+
+          (br 0))))
+
+
  (export "check_free_space" (func $check_free_space))
  (export "find_free" (func $find_free))
  (export "create_list_el" (func $create_list_el))
@@ -423,6 +472,7 @@
  (export "find_value_in_alist_from_key" (func $find_value_in_alist_from_key))
  (export "decrease_rc" (func $decrease_rc))
  (export "increase_rc" (func $increase_rc))
+ (export "free_gc_list" (func $free_gc_list))
  (export "create_gc_list" (func $create_gc_list))
  (export "malloc" (func $malloc))
  (export "add_to_rc_tab" (func $add_to_rc_tab))

@@ -618,6 +618,130 @@ class Test_free_list_el extends Test {
     }
 }
 
+class Test_free_gc_list extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20], 100);
+
+        const spec = [
+            DELIMETERS.list_start,
+            DELIMETERS.list_end,
+            4 * SIZE.i32,
+            DELIMETERS.null,
+            DELIMETERS.type_object,
+            14 * SIZE.i32,
+            9 * SIZE.i32,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.type_object,
+            23 * SIZE.i32,
+            DELIMETERS.list_end,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.list_start,
+            DELIMETERS.list_end,
+            18 * SIZE.i32,
+            DELIMETERS.null,
+            DELIMETERS.type_i32,
+            15,
+            DELIMETERS.list_end,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.list_start,
+            DELIMETERS.list_end,
+            27 * SIZE.i32,
+            DELIMETERS.null,
+            DELIMETERS.type_i32,
+            15,
+            DELIMETERS.list_end,
+        ];
+
+        const i32 = new Uint32Array(mem.buffer);
+        for(let i = 0; i < 100; i++) {
+            i32[i] = DELIMETERS.null;
+        }
+        for(let i = 0; i < spec.length; i++) {
+            i32[i] = spec[i];
+        }
+    }
+
+    get_target_memory_layout() {
+        return [
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.list_start,
+            DELIMETERS.list_end,
+            18 * SIZE.i32,
+            DELIMETERS.null,
+            DELIMETERS.type_i32,
+            15,
+            DELIMETERS.list_end,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+        ];
+    }
+
+    test_suite(exports) {
+        const {
+            add_element,
+            create_list,
+            create_gc_list,
+            free_gc_list,
+            increase_rc,
+            car,
+            cdr,
+            find_value_in_alist_from_key,
+            add_to_rc_tab,
+        } = exports;
+
+        const rc_table = create_list();
+
+        const gc_sublist1 = 14 * SIZE.i32;
+        add_to_rc_tab(rc_table, gc_sublist1);
+        increase_rc(rc_table, gc_sublist1);
+        increase_rc(rc_table, gc_sublist1);
+        const gc_sublist2 = 23 * SIZE.i32;
+        add_to_rc_tab(rc_table, gc_sublist2);
+        increase_rc(rc_table, gc_sublist2);
+
+        const gc_list = 0;
+        free_gc_list(rc_table, gc_list);
+
+        const i32 = new Uint32Array(this.memory.buffer);
+        const target_memory_layout = this.get_target_memory_layout();
+        for(let i = 0; i < target_memory_layout.length; i++)
+            this.test(i32[i], target_memory_layout[i]);
+
+        this.test(
+            car(find_value_in_alist_from_key(rc_table, gc_sublist1)),
+            1,
+        );
+        this.test(
+            car(find_value_in_alist_from_key(rc_table, gc_sublist2)),
+            0,
+        );
+    }
+}
+
+new Test_free_gc_list("free_gc_list");
 new Test_create_gc_list("create_gc_list");
 new Test_free("free");
 new Test_free_list_el("free_list_el");

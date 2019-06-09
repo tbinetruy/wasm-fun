@@ -682,13 +682,13 @@ class Test_free_gc_list extends Test {
             DELIMETERS.list_end,
             DELIMETERS.null,
             DELIMETERS.null,
+            DELIMETERS.list_start,
+            DELIMETERS.list_end,
+            27 * SIZE.i32,
             DELIMETERS.null,
-            DELIMETERS.null,
-            DELIMETERS.null,
-            DELIMETERS.null,
-            DELIMETERS.null,
-            DELIMETERS.null,
-            DELIMETERS.null,
+            DELIMETERS.type_i32,
+            15,
+            DELIMETERS.list_end,
         ];
     }
 
@@ -732,6 +732,41 @@ class Test_free_gc_list extends Test {
 }
 
 class Test_garbage_collect extends Test_free_gc_list {
+    get_target_memory_layout() {
+        return [
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.list_start,
+            DELIMETERS.list_end,
+            18 * SIZE.i32,
+            DELIMETERS.null,
+            DELIMETERS.type_i32,
+            15,
+            DELIMETERS.list_end,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+        ];
+    }
+
     test_suite(exports) {
         const {
             create_list,
@@ -744,6 +779,8 @@ class Test_garbage_collect extends Test_free_gc_list {
 
         const rc_table = create_list();
 
+        const gc_list = 0;
+        add_to_rc_tab(rc_table, gc_list);
         const gc_sublist1 = 14 * SIZE.i32;
         add_to_rc_tab(rc_table, gc_sublist1);
         increase_rc(rc_table, gc_sublist1);
@@ -751,6 +788,8 @@ class Test_garbage_collect extends Test_free_gc_list {
         const gc_sublist2 = 23 * SIZE.i32;
         add_to_rc_tab(rc_table, gc_sublist2);
         increase_rc(rc_table, gc_sublist2);
+
+
 
         garbage_collect(rc_table);
 
@@ -771,6 +810,7 @@ class Test_garbage_collect extends Test_free_gc_list {
 }
 
 new Test_free_gc_list("free_gc_list");
+new Test_garbage_collect("garbage_collect");
 new Test_create_gc_list("create_gc_list");
 new Test_free("free");
 new Test_free_list_el("free_list_el");

@@ -267,7 +267,7 @@
 
        (get_local $list_pointer)
        (get_local $el_addr)
-       (get_global $type_object)
+       (get_global $type_i32)
        (call $add_element)
        (drop)
 
@@ -428,21 +428,7 @@
                (get_local $tab_addr)
                (get_local $pointer)
                (call $car)
-               (call $decrease_rc)
-
-               (get_local $tab_addr)
-               (get_local $pointer)
-               (call $car)
-               (call $find_value_in_alist_from_key)
-               (call $car)
-               (i32.const 0)
-               (i32.eq)
-               (if
-                   (then
-                    (get_local $tab_addr)
-                    (get_local $pointer)
-                    (call $car)
-                    (call $free_gc_list)))))
+               (call $decrease_rc)))
 
           (get_local $pointer)
           (call $free_list_el)
@@ -459,7 +445,8 @@
           (br 0))))
 
  (func $garbage_collect (param $tab_addr i32)
-       (local $pointer i32)
+       (local $pointer1 i32)
+       (local $pointer2 i32)
        (local $counter i32)
        (set_local $counter (i32.const 1))
        (block $iter
@@ -467,10 +454,12 @@
           (get_local $tab_addr)
           (get_local $counter)
           (call $find_nth_element)
+          (set_local $pointer1)
+          (get_local $pointer1)
           (call $car)
-          (set_local $pointer)
+          (set_local $pointer2)
 
-          (get_local $pointer)
+          (get_local $pointer2)
           (i32.const 2)
           (call $find_nth_element)
           (call $car)
@@ -479,13 +468,13 @@
           (if
               (then
                (get_local $tab_addr)
-               (get_local $pointer)
+               (get_local $pointer2)
                (i32.const 1)
                (call $find_nth_element)
                (call $car)
                (call $free_gc_list)))
 
-          (get_local $pointer)
+          (get_local $pointer1)
           (call $cdr)
           (get_global $list_end_char)
           (i32.eq)

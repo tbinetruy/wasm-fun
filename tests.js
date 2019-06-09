@@ -694,13 +694,10 @@ class Test_free_gc_list extends Test {
 
     test_suite(exports) {
         const {
-            add_element,
             create_list,
-            create_gc_list,
             free_gc_list,
             increase_rc,
             car,
-            cdr,
             find_value_in_alist_from_key,
             add_to_rc_tab,
         } = exports;

@@ -424,17 +424,6 @@ class Test_nested extends Test {
     }
 }
 
-new Test_find_free("find_free");
-new Test_check_free_space("check_free_space");
-new Test_malloc("malloc");
-new Test_create_list_el("create_list_el");
-new Test_create_list("create_list");
-new Test_add_element("add_element");
-new Test_is_list_empty("is_list_empty");
-new Test_find_last_element("find_last_element");
-new Test_find_nth_element("find_nth_element");
-new Test_nested("nested lists");
-new Test_concat("concat");
 
 class Test_free extends Test {
     init_mem(mem) {
@@ -749,3 +738,14 @@ new Test_increase_rc("increase_decrease_rc");
 new Test_find_value_in_alist_from_key("find_value_in_alist_from_key");
 new Test_add_to_rc_tab("add_to_rc_tab");
 new Test_car_cdr_get_type("car, cdr, get_type");
+new Test_find_free("find_free");
+new Test_check_free_space("check_free_space");
+new Test_malloc("malloc");
+new Test_create_list_el("create_list_el");
+new Test_create_list("create_list");
+new Test_add_element("add_element");
+new Test_is_list_empty("is_list_empty");
+new Test_find_last_element("find_last_element");
+new Test_find_nth_element("find_nth_element");
+new Test_nested("nested lists");
+new Test_concat("concat");

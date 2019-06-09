@@ -611,7 +611,19 @@ class Test_free_gc_list extends Test {
     init_mem(mem) {
         this.mem_quick_init(mem, [10, 10, 20], 100);
 
-        const spec = [
+
+        const spec = this.get_init_memory_layout();
+        const i32 = new Uint32Array(mem.buffer);
+        for(let i = 0; i < 100; i++) {
+            i32[i] = DELIMETERS.null;
+        }
+        for(let i = 0; i < spec.length; i++) {
+            i32[i] = spec[i];
+        }
+    }
+
+    get_init_memory_layout() {
+        return [
             DELIMETERS.list_start,
             DELIMETERS.list_end,
             4 * SIZE.i32,
@@ -643,14 +655,6 @@ class Test_free_gc_list extends Test {
             15,
             DELIMETERS.list_end,
         ];
-
-        const i32 = new Uint32Array(mem.buffer);
-        for(let i = 0; i < 100; i++) {
-            i32[i] = DELIMETERS.null;
-        }
-        for(let i = 0; i < spec.length; i++) {
-            i32[i] = spec[i];
-        }
     }
 
     get_target_memory_layout() {
@@ -713,6 +717,45 @@ class Test_free_gc_list extends Test {
 
         const gc_list = 0;
         free_gc_list(rc_table, gc_list);
+
+        const i32 = new Uint32Array(this.memory.buffer);
+        const target_memory_layout = this.get_target_memory_layout();
+        for(let i = 0; i < target_memory_layout.length; i++)
+            this.test(i32[i], target_memory_layout[i]);
+
+        this.test(
+            car(find_value_in_alist_from_key(rc_table, gc_sublist1)),
+            1,
+        );
+        this.test(
+            car(find_value_in_alist_from_key(rc_table, gc_sublist2)),
+            0,
+        );
+    }
+}
+
+class Test_garbage_collect extends Test_free_gc_list {
+    test_suite(exports) {
+        const {
+            create_list,
+            garbage_collect,
+            increase_rc,
+            car,
+            find_value_in_alist_from_key,
+            add_to_rc_tab,
+        } = exports;
+
+        const rc_table = create_list();
+
+        const gc_sublist1 = 14 * SIZE.i32;
+        add_to_rc_tab(rc_table, gc_sublist1);
+        increase_rc(rc_table, gc_sublist1);
+        increase_rc(rc_table, gc_sublist1);
+        const gc_sublist2 = 23 * SIZE.i32;
+        add_to_rc_tab(rc_table, gc_sublist2);
+        increase_rc(rc_table, gc_sublist2);
+
+        garbage_collect(rc_table);
 
         const i32 = new Uint32Array(this.memory.buffer);
         const target_memory_layout = this.get_target_memory_layout();

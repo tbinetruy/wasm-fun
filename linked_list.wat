@@ -458,10 +458,50 @@
 
           (br 0))))
 
+ (func $garbage_collect (param $tab_addr i32)
+       (local $pointer i32)
+       (local $counter i32)
+       (set_local $counter (i32.const 1))
+       (block $iter
+         (loop
+          (get_local $tab_addr)
+          (get_local $counter)
+          (call $find_nth_element)
+          (call $car)
+          (set_local $pointer)
+
+          (get_local $pointer)
+          (i32.const 2)
+          (call $find_nth_element)
+          (call $car)
+          (i32.const 0)
+          (i32.eq)
+          (if
+              (then
+               (get_local $tab_addr)
+               (get_local $pointer)
+               (i32.const 1)
+               (call $find_nth_element)
+               (call $car)
+               (call $free_gc_list)))
+
+          (get_local $pointer)
+          (call $cdr)
+          (get_global $list_end_char)
+          (i32.eq)
+          (br_if $iter)
+
+          (get_local $counter)
+          (i32.const 1)
+          (i32.add)
+          (set_local $counter)
+
+          (br 0))))
 
  (export "check_free_space" (func $check_free_space))
  (export "find_free" (func $find_free))
  (export "create_list_el" (func $create_list_el))
+ (export "garbage_collect" (func $garbage_collect))
  (export "free" (func $free))
  (export "free_list_el" (func $free_list_el))
  (export "get_type" (func $get_type))

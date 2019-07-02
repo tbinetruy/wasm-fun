@@ -412,6 +412,27 @@
        (get_local $pointer))
 
 
+ (func $free_flat_list (param $list_addr i32)
+       (local $pointer i32)
+       (local $next_addr i32)
+       (get_local $list_addr)
+       (set_local $pointer)
+       (block $iter
+         (loop
+          (get_local $pointer)
+          (call $free_list_el)
+          (set_local $next_addr)
+
+          (get_local $next_addr)
+          (get_global $list_end_char)
+          (i32.eq)
+          (br_if $iter)
+
+          (get_local $next_addr)
+          (set_local $pointer)
+
+          (br 0))))
+
  (func $free_gc_list (param $tab_addr i32) (param $list_addr i32)
        (local $pointer i32)
        (local $next_addr i32)
@@ -567,6 +588,7 @@
  (export "decrease_rc" (func $decrease_rc))
  (export "increase_rc" (func $increase_rc))
  (export "free_gc_list" (func $free_gc_list))
+ (export "free_flat_list" (func $free_flat_list))
  (export "create_gc_list" (func $create_gc_list))
  (export "malloc" (func $malloc))
  (export "add_to_rc_tab" (func $add_to_rc_tab))

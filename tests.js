@@ -1034,5 +1034,57 @@ class Test_remove_nth_list_el extends Test {
             this.test(i32[i], target3_memory_layout[i]);
     }
 }
+
+class Test_free_flat_list extends Test {
+    init_mem(mem) {
+        const spec = this.get_init_memory_layout();
+        this.mem_length = spec.length;
+
+        const i32 = new Uint32Array(mem.buffer);
+        for(let i = 0; i < this.mem_length; i++) {
+            i32[i] = spec[i];
+        }
+    }
+
+    get_init_memory_layout() {
+        return [
+            DELIMETERS.list_start,
+            DELIMETERS.list_end,
+            4 * SIZE.i32,
+            DELIMETERS.null,
+            DELIMETERS.type_object,
+            17 * SIZE.i32,
+            9 * SIZE.i32,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.type_i32,
+            23,
+            12 * SIZE.i32,
+            DELIMETERS.type_object,
+            22 * SIZE.i32,
+            DELIMETERS.list_end,
+            DELIMETERS.null,
+        ];
+    }
+
+    get_patch() {
+        return [0, 1, 2, 4, 5, 6, 9, 10, 11, 12, 13, 14]
+            .map(e => [e, DELIMETERS.null]);
+    }
+
+    test_suite(exports) {
+        const { free_flat_list } = exports;
+
+        const list = 0;
+        free_flat_list(list);
+
+        const i32 = new Uint32Array(this.memory.buffer);
+        const target_memory_layout = this.patch_mem(i32, this.get_patch());
+        for(let i = 0; i < this.mem_length; i++)
+            this.test(i32[i], target_memory_layout[i]);
+    }
+}
+
+new Test_free_flat_list("Free flat list");
 new Test_Test("Base test class");
 new Test_remove_nth_list_el("remove_nth_list_el");

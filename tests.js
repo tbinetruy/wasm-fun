@@ -933,6 +933,46 @@ new Test_find_last_element("find_last_element");
 new Test_find_nth_element("find_nth_element");
 new Test_nested("nested lists");
 new Test_concat("concat");
+
+class Test_clean_rc_tab extends Test_free_gc_list {
+    get_target_memory_layout() {
+        return [
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+            DELIMETERS.null,
+        ];
+    }
+
+    test_suite(exports) {
+        const {
+            create_list,
+            increase_rc,
+            decrease_rc,
+            add_to_rc_tab,
+            clean_rc_tab,
+        } = exports;
+
+        const rc_table = create_list();
+
+        const list1 = create_list();
+        add_to_rc_tab(rc_table, list1);
+        const list2 = create_list();
+        add_to_rc_tab(rc_table, list2);
+        increase_rc(rc_table, list2);
+
+        this.test(JSON.stringify(this.read_list(rc_table)), `[[${list1},0],[${list2},1]]`);
+        clean_rc_tab(rc_table);
+        this.test(JSON.stringify(this.read_list(rc_table)), `[[${list2},1]]`);
+        decrease_rc(rc_table, list2);
+        clean_rc_tab(rc_table);
+        this.test(JSON.stringify(this.read_list(rc_table)), `[]`);
+    }
+}
+
+
 class Test_remove_nth_list_el extends Test {
     init_mem(mem) {
         const spec = this.get_init_memory_layout();
@@ -1085,6 +1125,7 @@ class Test_free_flat_list extends Test {
     }
 }
 
+new Test_clean_rc_tab("Clean rc tab");
 new Test_free_flat_list("Free flat list");
 new Test_Test("Base test class");
 new Test_remove_nth_list_el("remove_nth_list_el");

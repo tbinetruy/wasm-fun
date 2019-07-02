@@ -529,6 +529,36 @@
        (get_local $n)
        (call $find_nth_element)
        (call $cdr_addr))
+
+ (func $clean_rc_tab (param $tab_addr i32)
+       (local $pointer i32)
+       (local $counter i32)
+       (set_local $counter (i32.const 1))
+       (block $iter
+         (loop
+          (get_local $tab_addr)
+          (get_local $counter)
+          (call $find_nth_element)
+          (set_local $pointer)
+          (get_local $pointer)
+          (call $car)
+          (i32.const 2)
+          (call $nth_car)
+          (i32.const 0)
+          (i32.eq)
+          (if
+              (then
+               (get_local $tab_addr)
+               (get_local $counter)
+               (call $remove_nth_list_el)
+               (call $free_flat_list)))
+          (get_local $pointer)
+          (call $cdr)
+          (get_global $list_end_char)
+          (br_if $iter)
+
+          (br 0))))
+
  (func $garbage_collect (param $tab_addr i32)
        (local $pointer1 i32)
        (local $pointer2 i32)
@@ -592,6 +622,7 @@
  (export "create_gc_list" (func $create_gc_list))
  (export "malloc" (func $malloc))
  (export "add_to_rc_tab" (func $add_to_rc_tab))
+ (export "clean_rc_tab" (func $clean_rc_tab))
  (export "concat" (func $concat))
  (export "find_nth_element" (func $find_nth_element))
  (export "create_list" (func $create_list))

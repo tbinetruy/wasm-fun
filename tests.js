@@ -18,6 +18,12 @@ class Test {
         this.init_mem = this.init_mem.bind(this);
         this.get_mem = this.get_mem.bind(this);
 
+        this.result_info = {
+            fail: 0,
+            pass: 0,
+            comments: [],
+        };
+
         this.docstring = docstring;
         this.load_wasm();
     }
@@ -70,10 +76,18 @@ class Test {
     }
 
     test(a, b) {
-        if(a == b)
-            console.log("Pass", a, " == ", b);
-        else
-            console.log("Fail", a, " != ", b);
+        if(a == b) {
+            this.result_info.pass += 1;
+        } else {
+            this.result_info.fail += 1;
+            this.result_info.comments.push("Fail " + a + " != " + b);
+        }
+    }
+
+    print_results() {
+        console.log("Pass: ", this.result_info.pass, ", Fail: ", this.result_info.fail);
+        for(let comment of this.result_info.comments)
+            console.log(comment);
     }
 
     async load_wasm() {
@@ -94,6 +108,7 @@ class Test {
 
         console.log("============ " + this.docstring + " ============");
         this.test_suite(obj.instance.exports);
+        this.print_results();
     }
 
     test_suite(exports) {

@@ -6,7 +6,7 @@
     "anyfunc"))
 
 (setq wat-keywords
-      '("module" "import" "func" "data" "get_local" "call" "export" "param" "result" "table" "set_local" "br_if" "loop" "block" "if" "then" "else" "local" "global" "get_global" "set_global"))
+      '("module" "import" "func" "data" "get_local" "call" "export" "param" "result" "table" "set_local" "br_if" "loop" "block" "if" "then" "else" "local" "global" "get_global" "set_global" "drop" "br"))
 
 (defvar wat-tab-width nil "Width of a tab for WAT mode")
 

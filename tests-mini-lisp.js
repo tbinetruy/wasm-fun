@@ -22,6 +22,20 @@ class Mini_lisp {
         const processed_code = this.process_expr(code);
     }
 
+    load_expr_in_mem(expr) {
+        const list_p = this.api.create_list();
+        for(let i = 0; i < expr.length; i++) {
+            const first_el = expr[i];
+            if(typeof(first_el) === "object") {
+                this.api.add_element(list_p, this.load_expr_in_mem(expr[i]), DELIMETERS.type_object);
+            } else {
+                this.api.add_element(list_p, expr[i], DELIMETERS.type_i32);
+            }
+        }
+
+        return list_p;
+    }
+
     process_expr(expr, var_names = []) {
         if(typeof(expr) === "number")
             return expr;
@@ -166,13 +180,22 @@ class Mini_lisp {
 }
 
 class Test_mini_parser extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20]);
+    }
+
     test_suite(exports) {
         const lisp = new Mini_lisp(exports);
 
         const code = this.get_code();
         const result = lisp.run(code);
 
-        this.test(JSON.stringify(lisp.process_expr(code)), this.get_processed_code());
+        const processed_code = lisp.process_expr(code);
+        this.test(JSON.stringify(processed_code), this.get_processed_code());
+
+        const code_p = lisp.load_expr_in_mem(processed_code);
+        const code_as_list = this.read_list(code_p);
+        this.test(JSON.stringify(code_as_list), this.get_processed_code());
     }
 
     get_processed_code() {

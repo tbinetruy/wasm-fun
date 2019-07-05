@@ -207,11 +207,13 @@ class Test_mini_parser extends Test {
         return JSON.stringify(
             [7,
              [0, 0, [1, 2],
-              [2, [6, 1]],
-              [1, [[3, [3, 1, 2, 3]], [4, [4, 44, 45, 46]]],
-               [2, [6, 3]],
-               [5, [6, 4]],
-               [6, 3]]],
+              [7,
+               [2, [6, 1]],
+               [1, [[3, [3, 1, 2, 3]], [4, [4, 44, 45, 46]]],
+                [7,
+                 [2, [6, 3]],
+                 [5, [6, 4]],
+                 [6, 3]]]]],
              [0, [3, 1, 6, 2]]]
         );
     }
@@ -219,11 +221,13 @@ class Test_mini_parser extends Test {
     get_code() {
         return ['progn',
                     ['func', 'my_func', ['baz', 'bat'],
-                        ['print', ['read', 'baz']],
-                        ['let', [['foo', ['list', 1, 2, 3]], ['bar', ['string', 44, 45, 46]]],
-                            ['print', ['read', 'foo']],
-                            ['print_string', ['read', 'bar']],
-                            ['read', 'foo']]],
+                        ['progn',
+                            ['print', ['read', 'baz']],
+                            ['let', [['foo', ['list', 1, 2, 3]], ['bar', ['string', 44, 45, 46]]],
+                                ['progn',
+                                    ['print', ['read', 'foo']],
+                                    ['print_string', ['read', 'bar']],
+                                    ['read', 'foo']]]]],
                     ['my_func', ['list', 1, 6, 2]]];
     }
 }

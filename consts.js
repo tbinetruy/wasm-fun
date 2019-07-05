@@ -22,7 +22,8 @@ const TOKEN = {
     read_local_var: 'read',
     block_declaration: 'progn',
 };
+const token_names = Object.values(TOKEN);
 
 export {
-    SIZE, DELIMETERS, TOKEN,
+    SIZE, DELIMETERS, TOKEN, token_names
 };

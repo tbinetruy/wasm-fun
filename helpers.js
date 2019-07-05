@@ -1,4 +1,4 @@
-import { SIZE, DELIMETERS } from "./consts.js";
+import { SIZE, DELIMETERS, token_names } from "./consts.js";
 
 function read_list(addr, memory) {
     const list = [];
@@ -30,6 +30,14 @@ function read_list(addr, memory) {
     return -1;
 }
 
+function map_token_to_number(token) {
+    for(let i = 0; i < token_names.length; i++) {
+        if(token_names[i] === token)
+            return i;
+    }
+    return -1;
+}
+
 export {
-    read_list,
+    read_list, map_token_to_number
 }

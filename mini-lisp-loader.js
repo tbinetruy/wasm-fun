@@ -2,14 +2,14 @@
 // it preprocesses the code by mapping func/var names to integers
 
 import Test  from "./Test.js";
-import { SIZE, DELIMETERS, TOKEN } from "./consts.js";
-import { read_list } from "./helpers.js";
+import { SIZE, DELIMETERS, TOKEN, token_names } from "./consts.js";
+import { read_list, map_token_to_number } from "./helpers.js";
 
 
 class Mini_lisp_loader {
     constructor(api, memory) {
         this.api = api;
-        this.token_names = Object.values(TOKEN);
+        this.token_names = token_names;
         this.memory = memory;
     }
 
@@ -96,11 +96,7 @@ class Mini_lisp_loader {
     }
 
     map_token_to_number(token) {
-        for(let i = 0; i < this.token_names.length; i++) {
-            if(this.token_names[i] === token)
-                return i;
-        }
-        return -1;
+        return map_token_to_number(token);
     }
 
     map_varname_to_number(var_name, var_names) {

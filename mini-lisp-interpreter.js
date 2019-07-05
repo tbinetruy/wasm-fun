@@ -133,10 +133,9 @@ class Mini_lisp_interpreter {
     }
 
     eval_local_var(expr_p, env_p) {
-        const symbol = this.api.find_nth_element(expr_p, 2);
-        const var_p = this.api.find_value_in_alist_from_key(env_p, symbol);
-        //console.log(var_p, "=================", read_list(env_p, this.memory))
-        this.eval_expr(var_p, env_p);
+        const symbol = this.api.car(this.api.find_nth_element(expr_p, 2));
+        const value = this.api.find_value_in_alist_from_key(env_p, symbol);
+        return this.eval_expr(value, env_p);
     }
 
     create_rc_tab() {

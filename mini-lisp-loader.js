@@ -1,26 +1,16 @@
-import Test, { SIZE, DELIMETERS, read_list } from "./Test.js";
+// loads lisp code into memory
+// it preprocesses the code by mapping func/var names to integers
 
-const TOKEN = {
-    function: 'func',
-    declare_local_var: 'let',
-    print: 'print',
-    create_list: 'list',
-    create_string: 'string',
-    print_string: 'print_string',
-    read_local_var: 'read',
-    block_declaration: 'progn',
-};
+import Test  from "./Test.js";
+import { SIZE, DELIMETERS, TOKEN } from "./consts.js";
+import { read_list } from "./helpers.js";
 
 
-class Mini_lisp {
+class Mini_lisp_loader {
     constructor(api, memory) {
         this.api = api;
         this.token_names = Object.values(TOKEN);
         this.memory = memory;
-    }
-
-    run(code) {
-        const processed_code = this.process_expr(code);
     }
 
     load_expr_in_mem(expr) {
@@ -154,33 +144,9 @@ class Mini_lisp {
         }
     }
 
-    create_var(expr, rc_tab, env) {
-        const var_addr = this.encode_expr(expr);
-
-        const env_entry = this.api.create_list();
-        this.api.add_element(env_entry, 1, DELIMETERS.type_i32);
-        this.api.add_element(env_entry, var_addr, DELIMETERS.type_object);
-
-        this.api.add_element(env, env_entry);
-
-        this.api.add_to_rc_tab(rc_tab, var_addr);
-        this.api.increase_rc_counter(rc_tab, var_addr);
-
-        return var_addr;
-    }
-
-    eval_expr(expr_addr, rc_tab, env) {
-        return 0;
-    }
-
-    create_env(create_list) {
-        const rc_tab = create_list(); // maps addresses to reference count
-        const env = create_list();    // maps var names to addresses
-        return [rc_tab, env];
-    }
 }
 
-class Test_mini_parser extends Test {
+class Test_mini_lisp_loader extends Test {
     init_mem(mem) {
         const i32 = new Uint32Array(mem.buffer);
 
@@ -190,10 +156,9 @@ class Test_mini_parser extends Test {
     }
 
     test_suite(exports) {
-        const lisp = new Mini_lisp(exports, this.memory);
+        const lisp = new Mini_lisp_loader(exports, this.memory);
 
         const code = this.get_code();
-        const result = lisp.run(code);
 
         const processed_code = lisp.process_expr(code);
         this.test(JSON.stringify(processed_code), this.get_processed_code());
@@ -232,4 +197,6 @@ class Test_mini_parser extends Test {
     }
 }
 
-new Test_mini_parser("Mini lisp");
+new Test_mini_lisp_loader("Mini lisp");
+
+export default Mini_lisp_loader;

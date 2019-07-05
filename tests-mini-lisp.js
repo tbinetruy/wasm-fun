@@ -1,4 +1,4 @@
-import Test, { SIZE, DELIMETERS } from "./Test.js";
+import Test, { SIZE, DELIMETERS, read_list } from "./Test.js";
 
 const TOKEN = {
     function: 'func',
@@ -13,9 +13,10 @@ const TOKEN = {
 
 
 class Mini_lisp {
-    constructor(api) {
+    constructor(api, memory) {
         this.api = api;
         this.token_names = Object.values(TOKEN);
+        this.memory = memory;
     }
 
     run(code) {
@@ -185,7 +186,7 @@ class Test_mini_parser extends Test {
     }
 
     test_suite(exports) {
-        const lisp = new Mini_lisp(exports);
+        const lisp = new Mini_lisp(exports, this.memory);
 
         const code = this.get_code();
         const result = lisp.run(code);

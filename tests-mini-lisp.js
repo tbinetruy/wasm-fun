@@ -182,7 +182,11 @@ class Mini_lisp {
 
 class Test_mini_parser extends Test {
     init_mem(mem) {
-        this.mem_quick_init(mem, [10, 10, 20]);
+        const i32 = new Uint32Array(mem.buffer);
+
+        for (let i = 0; i < 2000; i++) {
+            i32[i] = DELIMETERS.null;
+        }
     }
 
     test_suite(exports) {

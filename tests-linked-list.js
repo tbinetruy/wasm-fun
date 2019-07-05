@@ -1,4 +1,5 @@
-import Test, { SIZE, DELIMETERS } from "./Test.js";
+import Test  from "./Test.js";
+import { SIZE, DELIMETERS } from "./consts.js";
 
 
 class Test_Test extends Test {
@@ -441,6 +442,22 @@ class Test_car_cdr_get_type extends Test {
         this.test(car(el_addr), value);
         this.test(cdr(el_addr), next_addr);
         this.test(get_type(el_addr), type);
+    }
+}
+
+
+class Test_get_list_length extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20]);
+    }
+
+    test_suite(exports) {
+        const { create_list, add_element, get_list_length } = exports;
+        const list_p = create_list();
+        add_element(list_p, 1, DELIMETERS.type_i32);
+        add_element(list_p, 1, DELIMETERS.type_i32);
+
+        this.test(get_list_length(list_p), 2);
     }
 }
 
@@ -985,3 +1002,4 @@ new Test_clean_rc_tab("Clean rc tab");
 new Test_free_flat_list("Free flat list");
 new Test_Test("Base test class");
 new Test_remove_nth_list_el("remove_nth_list_el");
+new Test_get_list_length("get list length");

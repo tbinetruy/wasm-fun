@@ -147,6 +147,38 @@
        (get_local $return))
 
 
+ (func $get_list_length (param $list_addr i32) (result i32)
+       (local $pointer i32)
+       (local $counter i32)
+       (set_local $pointer (get_local $list_addr))
+       (set_local $counter (i32.const 0))
+       (get_local $list_addr)
+       (call $is_list_empty)
+       (if
+           (then
+            (get_local $counter)
+            (set_local $counter))
+           (else
+            (block $iter
+              (loop
+               (get_local $pointer)
+               (call $cdr)
+               (set_local $pointer)
+
+               (get_local $pointer)
+               (get_global $list_end_char)
+               (i32.eq)
+               (br_if $iter)
+
+               (get_local $counter)
+               (i32.const 1)
+               (i32.add)
+               (set_local $counter)
+
+               (br 0)))))
+       (get_local $counter))
+
+
  (func $find_nth_element (param $list_addr i32) (param $el_num i32) (result i32)
        (local $return i32)
        (local $pointer i32)
@@ -611,6 +643,7 @@
  (export "free_list_el" (func $free_list_el))
  (export "get_type" (func $get_type))
  (export "car" (func $car))
+ (export "get_list_length" (func $get_list_length))
  (export "cdr" (func $cdr))
  (export "car_addr" (func $car_addr))
  (export "cdr_addr" (func $cdr_addr))

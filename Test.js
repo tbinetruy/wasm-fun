@@ -3,6 +3,11 @@ import { read_list } from "./helpers.js";
 
 
 class Test {
+    /**
+    * Class to be inherited to easily test wasm code.
+    * @param {string} docstring - Test description.
+    * @property {Dict} result_info - Test result statistics
+    */
     constructor(docstring) {
         this.test = this.test.bind(this);
         this.load_wasm = this.load_wasm.bind(this);
@@ -20,6 +25,12 @@ class Test {
         this.load_wasm();
     }
 
+    /**
+    * Patch a memory array.
+    * @param {Uint32Array} _mem - Memory array.
+    * @param {Array<Array<Integer>>} patch - Memory patch, elements are of the form [address, new_value].
+    * @returns {Array} New memory layout.
+    */
     patch_mem(_mem, patch) {
         const mem = [..._mem];
         for(let i = 0; i < mem.length; i++) {
@@ -32,15 +43,28 @@ class Test {
         return mem;
     }
 
+    /**
+    * Read list from memory
+    * @param {Integer} addr - Pointer to list
+    * @returns {Array} JS list representation.
+    */
     read_list(addr) {
         return read_list(addr, this.memory);
     }
 
+    /**
+    * Stores the memory buffer in the browser window object and logs a line.
+    */
     debug() {
         window.mem = new Uint32Array(this.memory.buffer);
         console.log("============");
     }
 
+    /**
+    * Asserts weak equality between two values
+    * @param {any} a - element A
+    * @param {any} b - element B
+    */
     test(a, b) {
         if(a == b) {
             this.result_info.pass += 1;
@@ -50,12 +74,20 @@ class Test {
         }
     }
 
+    /**
+    * Print the test output for this suite.
+    */
     print_results() {
         console.log("Pass: ", this.result_info.pass, ", Fail: ", this.result_info.fail);
         for(let comment of this.result_info.comments)
             console.log(comment);
     }
 
+    /**
+    * Loads the wasm code with the memory layout provided by `this.get_mem` and globals.
+    * It then runs the test suite by calling `this.test_suite` with the wasm exports as
+    * argument. Finally, it prints the test results.
+    */
     async load_wasm() {
         const memory = this.get_mem();
 
@@ -77,14 +109,26 @@ class Test {
         this.print_results();
     }
 
+    /**
+    * Test suite to run with given webassembly exports and memory layout.
+    * @param {Dict<Function>} exports - WASM exports you can use.
+    */
     test_suite(exports) {
         // To override when inheriting
     }
 
+    /**
+    * Inits the memory layout
+    * @param {WebAssembly.Memory} mem - Memory to patch.
+    */
     init_mem(mem) {
         // To override when inheriting
     }
 
+    /**
+    * Creates a webassembly memory object and stores it in `this.memory`.
+    * @returns {WebAssembly.Memory} Webassembly memory object to use in tests.
+    */
     get_mem() {
         const memory = new WebAssembly.Memory({initial:1});
         this.init_mem(memory);

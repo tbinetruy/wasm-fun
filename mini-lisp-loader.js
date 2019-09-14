@@ -7,18 +7,32 @@ import { read_list, map_token_to_number } from "./helpers.js";
 
 
 class Mini_lisp_loader {
+    /**
+    * Objects instantiated from this class can load lisp code in wasm memory
+    * using the wasm linked list API.
+    * @param {Dict<functions>} api - wasm lisp functions
+    */
     constructor(api, memory) {
         this.api = api;
         this.token_names = token_names;
-        this.memory = memory;
     }
 
+    /**
+    * Loads code in wasm memory by storing it in a list. We go through the expression tree
+    * recursively: either the current element is an object in wich case we recurse, or it is
+    * not and we add it to the list.
+    * @param {intAST} expr - contains the processed AST
+    */
     load_expr_in_mem(expr) {
         const list_p = this.api.create_list();
         for(let i = 0; i < expr.length; i++) {
             const first_el = expr[i];
             if(typeof(first_el) === "object") {
-                this.api.add_element(list_p, this.load_expr_in_mem(expr[i]), DELIMETERS.type_object);
+                this.api.add_element(
+                    list_p,
+                    this.load_expr_in_mem(expr[i]),
+                    DELIMETERS.type_object
+                );
             } else {
                 this.api.add_element(list_p, expr[i], DELIMETERS.type_i32);
             }
@@ -27,25 +41,42 @@ class Mini_lisp_loader {
         return list_p;
     }
 
+    /**
+    * Replaces an expression's variable and function names with integers bijectively. This is
+    * simpler to store in memory and takes less space.
+    * @param {Expression} expr - A lisp expression
+    * @param {Array<String>} var_names - Variable and function names as strings that are in
+    *     the current closure.
+    * @returns {intAST} the expression converted to nested arrays of integers.
+    * @throws {VariableError} Read undeclared variables and vice-versa.
+    */
     process_expr(expr, var_names = []) {
         if(typeof(expr) === "number")
             return expr;
 
+        // the converted expression
         const new_expr = [];
 
+        // Fist element in expression
         const first_el = expr[0];
 
+        // If the first element of the expression is another expression,
+        // we recurse and push the result
         if(typeof(first_el) === "object") {
             new_expr.push(this.process_expr(first_el), [...var_names]);
-        } else if(typeof(first_el) === "string") {
+        }
+        // If the first element is a string, then it is a function name.
+        else if(typeof(first_el) === "string") {
             let el_name = this.map_token_to_number(first_el);
             el_name = el_name != -1 ? el_name : this.map_varname_to_number(first_el, var_names);
             new_expr.push(el_name);
 
             if(first_el === TOKEN.function) {
+                // handle function name
                 const func_name = expr[1];
                 new_expr.push(this.map_varname_to_number(func_name, var_names));
 
+                // handle function arguments
                 const params = expr[2];
                 const new_params = [];
                 const l0 = var_names.length;
@@ -55,9 +86,13 @@ class Mini_lisp_loader {
                 }
                 new_expr.push(new_params);
 
+                // handle function body
                 for(let i = 3; i < expr.length; i++)
                     new_expr.push(this.process_expr(expr[i], [...var_names]));
             } else if(first_el === TOKEN.declare_local_var) {
+                // ['let', [[name1, value1], ..., [nameN, valueN]], bodyExpr1, ..., bodyExprM]
+
+                // handle declarations which are of type (str, expr)
                 const params = [];
                 for(let subexpr of expr[1]) {
                     const local_var_name = subexpr[0];
@@ -73,14 +108,17 @@ class Mini_lisp_loader {
                 }
                 new_expr.push(params);
 
+                // handle body
                 for(let i = 2; i < expr.length; i++)
                     new_expr.push(this.process_expr(expr[i], [...var_names]));
             } else if (first_el === TOKEN.read_local_var) {
+                // ['read', varname]
                 const local_var_name = expr[1];
                 if(!var_names.includes(local_var_name))
                     throw "Variable does not exists";
                 new_expr.push(this.map_varname_to_number(local_var_name, var_names));
             } else {
+                // TODO: see if this ever runs...
                 for(let i = 1; i < expr.length; i++) {
                     new_expr.push(this.process_expr(expr[i], [...var_names]));
                 }
@@ -95,10 +133,21 @@ class Mini_lisp_loader {
         return new_expr;
     }
 
+    /**
+    * Bijectively map a token string to an integer. A token being a stdlib function name.
+    * @param {String} token - Token name in string space.
+    * @returns {Integer} token name in integer space.
+    */
     map_token_to_number(token) {
         return map_token_to_number(token);
     }
 
+    /**
+     * Bijectively map a string variable name to an integer taking into account stdlib
+     * function names.
+     * @param {String} token - Token name in string space.
+     * @returns {Integer} token name in integer space.
+     */
     map_varname_to_number(var_name, var_names) {
         for(let i = 0; i < var_names.length; i++) {
             if(var_names[i] === var_name)
@@ -107,39 +156,6 @@ class Mini_lisp_loader {
         var_names.push(var_name);
         return var_names.length - 1;
     }
-
-    encode_expr(code) {
-        const list_p = this.api.create_list();
-
-        for(let instruction of code) {
-            const first_el = code[0];
-
-            if(typeof(first_el) === "object") {
-                const sublist_p = this.encode_expr(first_el);
-                this.api.add_element(list_p, sublist_p);
-            } else if(typeof(first_el) === "string") {
-                let el_name = this.default_func_name_to_number(first_el);
-                el_name = el_name != -1 ? el_name : this.var_name_to_number(first_el);
-                const el_p = this.api.create_list_el(
-                    DELIMETERS.type_i32,
-                    el_name,
-                    DELIMETERS.list_end,
-                );
-                this.api.add_element(list_p, el_p);
-
-                if(first_el == TOKEN.function) {
-                }
-            } else {
-                throw "Error";
-            }
-
-            for(let i = 1; i < code.length; i++) {
-                const sublist_p = this.encode_expr();
-                this.api.add_element(list_p, sublist_p);
-            }
-        }
-    }
-
 }
 
 class Test_mini_lisp_loader extends Test {
@@ -152,7 +168,7 @@ class Test_mini_lisp_loader extends Test {
     }
 
     test_suite(exports) {
-        const lisp = new Mini_lisp_loader(exports, this.memory);
+        const lisp = new Mini_lisp_loader(exports);
 
         const code = this.get_code();
 

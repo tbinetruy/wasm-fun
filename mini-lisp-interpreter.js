@@ -159,7 +159,7 @@ class Test_mini_lisp_interpreter extends Test {
     }
 
     test_suite(exports) {
-        const lisp_loader = new Lisp_loader(exports, this.memory);
+        const lisp_loader = new Lisp_loader(exports);
         const lisp_interpreter = new Mini_lisp_interpreter(exports, this.memory);
 
         const answer = 12;

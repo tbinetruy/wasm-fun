@@ -90,7 +90,7 @@ class Mini_lisp_loader {
                 for(let i = 3; i < expr.length; i++)
                     new_expr.push(this.process_expr(expr[i], [...var_names]));
             } else if(first_el === TOKEN.declare_local_var) {
-                // ['let', [[name1, value1], ..., [nameN, valueN]], bodyExpr1, ..., bodyExprM]
+                // ['let', [[name1, value1], ..., [nameN, valueN]], bodyExpr1]
 
                 // handle declarations which are of type (str, expr)
                 const params = [];

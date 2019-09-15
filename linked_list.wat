@@ -429,6 +429,25 @@
 
        (get_local $pointer))
 
+ (func $create_gc_list_el (param $tab_addr i32)
+                          (param $type i32)
+                          (param $value i32)
+                          (param $next_addr i32)
+                          (result i32)
+       (local $pointer i32)
+       (get_local $type)
+       (get_local $value)
+       (get_local $next_addr)
+       (call $create_list_el)
+       (set_local $pointer)
+
+       (get_local $tab_addr)
+       (get_local $pointer)
+       (call $add_to_rc_tab)
+
+       (get_local $pointer))
+
+
  (func $free_list_el (param $el_addr i32) (result i32)
        (local $pointer i32)
        (get_local $el_addr)
@@ -442,6 +461,22 @@
        (call $free)
 
        (get_local $pointer))
+
+
+ (func $free_gc_list_el (param $tab_addr i32)
+                        (param $el_addr i32)
+                        (result i32)
+       (local $pointer i32)
+       (get_local $el_addr)
+       (call $free_list_el)
+       (set_local $pointer)
+
+       (get_local $tab_addr)
+       (get_local $el_addr)
+       (call $decrease_rc)
+
+       (get_local $pointer))
+
 
 
  (func $free_flat_list (param $list_addr i32)
@@ -641,6 +676,7 @@
  (export "free" (func $free))
  (export "remove_nth_list_el" (func $remove_nth_list_el))
  (export "free_list_el" (func $free_list_el))
+ (export "free_gc_list_el" (func $free_gc_list_el))
  (export "get_type" (func $get_type))
  (export "car" (func $car))
  (export "get_list_length" (func $get_list_length))
@@ -653,6 +689,7 @@
  (export "free_gc_list" (func $free_gc_list))
  (export "free_flat_list" (func $free_flat_list))
  (export "create_gc_list" (func $create_gc_list))
+ (export "create_gc_list_el" (func $create_gc_list_el))
  (export "malloc" (func $malloc))
  (export "add_to_rc_tab" (func $add_to_rc_tab))
  (export "clean_rc_tab" (func $clean_rc_tab))

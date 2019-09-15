@@ -560,6 +560,39 @@ class Test_create_gc_list extends Test {
     }
 }
 
+
+class Test_create_gc_list_el extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20], 100);
+    }
+
+    test_suite(exports) {
+        const {
+            create_list,
+            create_gc_list_el,
+            car,
+            find_value_in_alist_from_key,
+        } = exports;
+
+        const rc_table = create_list();
+
+        const [type, value, next_addr] = [1, 2, 3];
+        const gc_list_el = create_gc_list_el(
+            rc_table,
+            type,
+            value,
+            next_addr,
+        );
+
+        this.test(
+            car(find_value_in_alist_from_key(rc_table, gc_list_el)),
+            0,
+        );
+
+        this.test(car(gc_list_el), value);
+    }
+}
+
 class Test_free_list_el extends Test {
     init_mem(mem) {
         this.mem_quick_init(mem, [10, 10, 20], 100);
@@ -581,6 +614,50 @@ class Test_free_list_el extends Test {
         this.test(get_type(list_el_addr), DELIMETERS.null);
         this.test(car(list_el_addr), DELIMETERS.null);
         this.test(cdr(list_el_addr), DELIMETERS.null);
+    }
+}
+
+
+class Test_free_gc_list_el extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20], 100);
+    }
+
+    test_suite(exports) {
+        const {
+            create_list,
+            create_gc_list_el,
+            free_gc_list_el,
+            car,
+            cdr,
+            get_type,
+            increase_rc,
+            find_value_in_alist_from_key,
+            add_to_rc_tab,
+        } = exports;
+
+        const rc_table = create_list();
+        const [type, value, next_addr] = [1, 2, 3];
+        const list_el_addr = create_gc_list_el(
+            rc_table,
+            type,
+            value,
+            next_addr,
+        );
+
+        increase_rc(rc_table, list_el_addr);
+        this.test(
+            car(find_value_in_alist_from_key(rc_table, list_el_addr)),
+            1,
+        );
+        this.test(
+            free_gc_list_el(rc_table, list_el_addr),
+            next_addr
+        );
+        this.test(
+            car(find_value_in_alist_from_key(rc_table, list_el_addr)),
+            0,
+        );
     }
 }
 
@@ -1003,3 +1080,5 @@ new Test_free_flat_list("Free flat list");
 new Test_Test("Base test class");
 new Test_remove_nth_list_el("remove_nth_list_el");
 new Test_get_list_length("get list length");
+new Test_create_gc_list_el("gc_list_el")
+new Test_free_gc_list_el("free_gc_list_el");

@@ -843,7 +843,7 @@
  (export "is_list_empty" (func $is_list_empty))
  (export "find_last_element" (func $find_last_element))
  (export "add_element" (func $add_element))
- (export "add_gc_element" (func $add_gc_element)))
+ (export "add_gc_element" (func $add_gc_element))
  (export "find_position_in_alist_from_key_addr" (func $find_position_in_alist_from_key_addr))
  (export "decrease_gc_el_rc" (func $decrease_gc_el_rc))
  (export "get_gc_el_rc_count" (func $get_gc_el_rc_count)))

@@ -668,12 +668,12 @@ class Test_free_gc_list extends Test {
 
         const spec = this.get_init_memory_layout();
         const i32 = new Uint32Array(mem.buffer);
-        for(let i = 0; i < 100; i++) {
+        for(let i = 0; i < 1000; i++) {
             i32[i] = DELIMETERS.null;
         }
-        for(let i = 0; i < spec.length; i++) {
-            i32[i] = spec[i];
-        }
+        //for(let i = 0; i < spec.length; i++) {
+        //    i32[i] = spec[i];
+        //}
     }
 
     get_init_memory_layout() {

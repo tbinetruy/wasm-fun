@@ -249,6 +249,45 @@
 
        (get_local $list_addr))
 
+
+ (func $add_gc_element (param $rc_tab_addr i32)
+                       (param $list_addr i32)
+                       (param $el_value i32)
+                       (param $el_type i32)
+                       (result i32)
+       (local $pointer i32)
+
+       (get_local $rc_tab_addr)
+       (get_local $el_type)
+       (get_local $el_value)
+       (get_global $list_end_char)
+       (call $create_gc_list_el)
+       (set_local $pointer)
+
+       (get_local $rc_tab_addr)
+       (get_local $pointer)
+       (call $increase_rc)
+
+       (get_local $el_type)
+       (get_global $type_object)
+       (i32.eq)
+       (if
+           (then
+            (get_local $rc_tab_addr)
+            (get_local $el_value)
+            (call $increase_rc)))
+
+       (get_local $list_addr)
+       (call $find_last_element)
+       (get_global $size_i32)
+       (i32.const 2)
+       (i32.mul)
+       (i32.add)
+       (get_local $pointer)
+       (i32.store)
+
+       (get_local $list_addr))
+
  (func $concat (param $listA_addr i32) (param $listB_addr i32) (result i32)
        (get_local $listA_addr)
        (call $find_last_element)
@@ -698,4 +737,5 @@
  (export "create_list" (func $create_list))
  (export "is_list_empty" (func $is_list_empty))
  (export "find_last_element" (func $find_last_element))
- (export "add_element" (func $add_element)))
+ (export "add_element" (func $add_element))
+ (export "add_gc_element" (func $add_gc_element)))

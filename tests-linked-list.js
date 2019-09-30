@@ -774,14 +774,63 @@ class Test_free_gc_list extends Test {
         for(let i = 0; i < target_memory_layout.length; i++)
             this.test(i32[i], target_memory_layout[i]);
 
+
+class Test_add_gc_element extends Test {
+    init_mem(mem) {
+        this.mem_quick_init(mem, [10, 10, 20], 100);
+
+
+        const spec = this.get_init_memory_layout();
+        const i32 = new Uint32Array(mem.buffer);
+        for(let i = 0; i < 1000; i++) {
+            i32[i] = DELIMETERS.null;
+        }
+    }
+
+    get_init_memory_layout() {}
+
+    test_suite(exports) {
+        const {
+            create_list,
+            create_gc_list,
+            create_gc_list_el,
+            free_gc_list,
+            increase_rc,
+            car,
+            cdr,
+            find_value_in_alist_from_key,
+            add_to_rc_tab,
+            add_gc_element,
+            find_nth_element,
+        } = exports;
+
+        const rc_tab = create_list();
+
+        const gc_list = create_gc_list(rc_tab);
+
+        add_gc_element(rc_tab, gc_list, 1, DELIMETERS.type_i32);
+
+        const gc_sublist = create_gc_list(rc_tab);
+        add_gc_element(rc_tab, gc_list, gc_sublist, DELIMETERS.type_object);
+
+        // check that gc_list is in the rc_tab
+        this.test(this.read_list(rc_tab)[0][0], gc_list);
+        // check that gc_list_el is in the rc_tab
         this.test(
-            car(find_value_in_alist_from_key(rc_table, gc_sublist1)),
-            1,
+            this.read_list(rc_tab)[1][0],
+            cdr(find_nth_element(gc_list, 0))
         );
+        // gc_list has zero references pointing to it
+        this.test(this.read_list(rc_tab)[0][1], 0);
+        // first element has 1 reference to it (the gc_list head)
+        this.test(this.read_list(rc_tab)[1][1], 1);
+        // check that sublist is in the rc_tab
         this.test(
-            car(find_value_in_alist_from_key(rc_table, gc_sublist2)),
-            0,
+            this.read_list(rc_tab)[2][0],
+            gc_sublist
         );
+        // gc_sublist has one reference pointing to it
+        this.test(this.read_list(rc_tab)[2][1], 1);
     }
 }
 
@@ -1082,3 +1131,4 @@ new Test_remove_nth_list_el("remove_nth_list_el");
 new Test_get_list_length("get list length");
 new Test_create_gc_list_el("gc_list_el")
 new Test_free_gc_list_el("free_gc_list_el");
+new Test_add_gc_element("add gc element");

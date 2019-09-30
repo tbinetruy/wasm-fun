@@ -746,6 +746,22 @@ class Test_free_gc_list extends Test {
         ];
     }
 
+    test_get_gc_el_rc_count(exports) {
+        const {
+            create_list,
+            create_gc_list,
+            increase_rc,
+            get_gc_el_rc_count,
+        } = exports;
+
+        const rc_tab = create_list();
+        const gc_list1 = create_gc_list(rc_tab);
+        const gc_list2 = create_gc_list(rc_tab);
+        increase_rc(rc_tab, gc_list1);
+        this.test(get_gc_el_rc_count(rc_tab, gc_list1), 1);
+        this.test(get_gc_el_rc_count(rc_tab, gc_list2), 0);
+    }
+
     test_find_position_in_alist_from_key_addr(exports) {
         const {
             create_list,
@@ -761,6 +777,7 @@ class Test_free_gc_list extends Test {
     }
 
     test_suite(exports) {
+        this.test_get_gc_el_rc_count(exports);
         this.test_find_position_in_alist_from_key_addr(exports);
         const {
             create_list,

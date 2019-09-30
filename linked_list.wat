@@ -506,6 +506,17 @@
        (i32.sub)
        (i32.store))
 
+ (func $get_gc_el_rc_count (param $tab_addr i32)
+                           (param $el_addr i32)
+                           (result i32)
+       (local $rc_entry_p i32)
+       (get_local $tab_addr)
+       (get_local $el_addr)
+       (call $find_value_in_alist_from_key)
+       (set_local $rc_entry_p)
+       (get_local $rc_entry_p)
+       (call $car))
+
  (func $create_gc_list (param $tab_addr i32) (result i32)
        (local $pointer i32)
        (call $create_list)
@@ -789,3 +800,4 @@
  (export "add_element" (func $add_element))
  (export "add_gc_element" (func $add_gc_element)))
  (export "find_position_in_alist_from_key_addr" (func $find_position_in_alist_from_key_addr))
+ (export "get_gc_el_rc_count" (func $get_gc_el_rc_count)))

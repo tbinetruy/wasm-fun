@@ -519,6 +519,9 @@
 
  (func $decrease_gc_el_rc(param $tab_addr i32) (param $el_addr i32)
        (local $next_addr i32)
+       (local $should_free i32)
+       (get_global $null_char)
+       (set_local $should_free)
 
        (get_local $tab_addr)
        (get_local $el_addr)
@@ -540,7 +543,10 @@
             (get_local $el_addr)
             (call $find_position_in_alist_from_key_addr)
             (call $remove_nth_list_el)
-            (drop)))
+            (drop)
+
+            (i32.const 1)
+            (set_local $should_free)))
 
        (get_local $el_addr)
        (call $get_type)
@@ -556,11 +562,22 @@
        (get_local $next_addr)
        (get_global $list_end_char)
        (i32.ne)
+       (get_local $should_free)
+       (i32.and)
        (if
            (then
             (get_local $tab_addr)
             (get_local $next_addr)
-            (call $decrease_gc_el_rc))))
+            (call $decrease_gc_el_rc)))
+
+       (i32.const 1)
+       (get_local $should_free)
+       (i32.eq)
+       (if
+           (then
+            (get_local $el_addr)
+            (call $free_list_el)
+            (drop))))
 
  (func $create_gc_list (param $tab_addr i32) (result i32)
        (local $pointer i32)

@@ -816,22 +816,29 @@ class Test_free_gc_list extends Test {
 
         // construct sublist: [1, sublist2, 20]
         add_gc_element(rc_tab, gc_sublist1, 10, DELIMETERS.type_i32);
-        add_gc_element(rc_tab, gc_list, gc_sublist2, DELIMETERS.type_object);
+        add_gc_element(rc_tab, gc_sublist1, gc_sublist2, DELIMETERS.type_object);
         add_gc_element(rc_tab, gc_sublist1, 20, DELIMETERS.type_i32);
 
         // construct sublist2
-        add_gc_element(rc_tab, gc_sublist1, 100, DELIMETERS.type_i32);
-        add_gc_element(rc_tab, gc_sublist1, 200, DELIMETERS.type_i32);
+        add_gc_element(rc_tab, gc_sublist2, 100, DELIMETERS.type_i32);
+        add_gc_element(rc_tab, gc_sublist2, 200, DELIMETERS.type_i32);
 
+        this.debug()
+        console.log(this.read_list(rc_tab))
+        console.log(this.read_list(gc_list), window.mem[396/4 + 2], window.mem[816/4 + 1])
         decrease_gc_el_rc(rc_tab, gc_list)
+        console.log(gc_sublist2, window.mem[396/4 + 2], window.mem[816/4 + 1])
+        console.log(this.read_list(gc_sublist2))
 
         // test that gc_list and gc_sublist1 are not in rc_tab anymore
         // but that sublist2 is with 1 as reference counter
         const rc_tab_js = this.read_list(rc_tab)
+        console.log(rc_tab_js)
         this.test(this.contains_addr(rc_tab_js, gc_list), false)
 
         this.test(this.contains_addr(rc_tab_js, gc_sublist1), false)
         this.test(this.contains_addr(rc_tab_js, gc_sublist2), true)
+
         this.test(this.check_addr_rc_value(rc_tab_js, gc_sublist2, 1), true)
 
     }

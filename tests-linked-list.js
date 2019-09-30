@@ -779,32 +779,88 @@ class Test_free_gc_list extends Test {
     test_suite(exports) {
         this.test_get_gc_el_rc_count(exports);
         this.test_find_position_in_alist_from_key_addr(exports);
+
         const {
             create_list,
-            free_gc_list,
+            create_gc_list,
+            create_gc_list_el,
+            free_gc_list_el,
             increase_rc,
             car,
             find_value_in_alist_from_key,
             add_to_rc_tab,
+            add_gc_element,
+            decrease_gc_el_rc,
         } = exports;
 
-        const rc_table = create_list();
 
-        const gc_sublist1 = 14 * SIZE.i32;
-        add_to_rc_tab(rc_table, gc_sublist1);
-        increase_rc(rc_table, gc_sublist1);
-        increase_rc(rc_table, gc_sublist1);
-        const gc_sublist2 = 23 * SIZE.i32;
-        add_to_rc_tab(rc_table, gc_sublist2);
-        increase_rc(rc_table, gc_sublist2);
+        const rc_tab = create_list();
 
-        const gc_list = 0;
-        free_gc_list(rc_table, gc_list);
+        // We will test that everything works properly by nesting
+        // 3 lists. We setup the test so that after freeing the first
+        // list, the second one gets freed as well, but the third one
+        // does not
+        const gc_list = create_gc_list(rc_tab);
+        const gc_sublist1 = create_gc_list(rc_tab);
+        const gc_sublist2 = create_gc_list(rc_tab);
 
-        const i32 = new Uint32Array(this.memory.buffer);
-        const target_memory_layout = this.get_target_memory_layout();
-        for(let i = 0; i < target_memory_layout.length; i++)
-            this.test(i32[i], target_memory_layout[i]);
+        // rc_count == 1 for list
+        increase_rc(rc_tab, gc_list);
+        // rc_count == 2 for sublist2
+        increase_rc(rc_tab, gc_sublist2);
+
+        // construct list: [1, sublist1, 2]
+        add_gc_element(rc_tab, gc_list, 1, DELIMETERS.type_i32);
+        add_gc_element(rc_tab, gc_list, gc_sublist1, DELIMETERS.type_object);
+        add_gc_element(rc_tab, gc_list, 2, DELIMETERS.type_i32);
+
+        // construct sublist: [1, sublist2, 20]
+        add_gc_element(rc_tab, gc_sublist1, 10, DELIMETERS.type_i32);
+        add_gc_element(rc_tab, gc_list, gc_sublist2, DELIMETERS.type_object);
+        add_gc_element(rc_tab, gc_sublist1, 20, DELIMETERS.type_i32);
+
+        // construct sublist2
+        add_gc_element(rc_tab, gc_sublist1, 100, DELIMETERS.type_i32);
+        add_gc_element(rc_tab, gc_sublist1, 200, DELIMETERS.type_i32);
+
+        decrease_gc_el_rc(rc_tab, gc_list)
+
+        // test that gc_list and gc_sublist1 are not in rc_tab anymore
+        // but that sublist2 is with 1 as reference counter
+        const rc_tab_js = this.read_list(rc_tab)
+        this.test(this.contains_addr(rc_tab_js, gc_list), false)
+
+        this.test(this.contains_addr(rc_tab_js, gc_sublist1), false)
+        this.test(this.contains_addr(rc_tab_js, gc_sublist2), true)
+        this.test(this.check_addr_rc_value(rc_tab_js, gc_sublist2, 1), true)
+
+    }
+
+    /**
+    * Checks if an address is in the reference counting table
+    * @param {RcTab} rc_tab - pointer to the reference counting table
+    * @param {Int} addr - Address of element to check
+    * @returns {Boolean} Whether the address is in the reference counting tab
+    */
+    contains_addr(rc_tab, addr) {
+        return rc_tab
+          .map(e => e[0] === addr)
+          .reduce((acc, e) => (e ? acc + 1 : acc));
+    }
+
+    /**
+     * Checks the value of an address is in the reference counting table
+     * @param {RcTab} rc_tab - pointer to the reference counting table
+     * @param {Int} addr - Address of element to check
+     * @param {Int} value - reference count of element to check
+     * @returns {Boolean} Whether the address has the reference count
+     */
+    check_addr_rc_value(rc_tab, addr, value) {
+        return rc_tab
+          .map(e => e[1] === value)
+          .reduce((acc, e) => (e ? acc + 1 : acc));
+    }
+}
 
 
 class Test_add_gc_element extends Test {

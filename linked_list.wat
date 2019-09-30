@@ -517,6 +517,51 @@
        (get_local $rc_entry_p)
        (call $car))
 
+ (func $decrease_gc_el_rc(param $tab_addr i32) (param $el_addr i32)
+       (local $next_addr i32)
+
+       (get_local $tab_addr)
+       (get_local $el_addr)
+       (call $decrease_rc)
+
+       (get_local $el_addr)
+       (call $cdr)
+       (set_local $next_addr)
+
+       (get_local $tab_addr)
+       (get_local $el_addr)
+       (call $get_gc_el_rc_count)
+       (i32.const 0)
+       (i32.eq)
+       (if
+           (then
+            (get_local $tab_addr)
+            (get_local $tab_addr)
+            (get_local $el_addr)
+            (call $find_position_in_alist_from_key_addr)
+            (call $remove_nth_list_el)
+            (drop)))
+
+       (get_local $el_addr)
+       (call $get_type)
+       (get_global $type_object)
+       (i32.eq)
+       (if
+           (then
+            (get_local $tab_addr)
+            (get_local $el_addr)
+            (call $car)
+            (call $decrease_gc_el_rc)))
+
+       (get_local $next_addr)
+       (get_global $list_end_char)
+       (i32.ne)
+       (if
+           (then
+            (get_local $tab_addr)
+            (get_local $next_addr)
+            (call $decrease_gc_el_rc))))
+
  (func $create_gc_list (param $tab_addr i32) (result i32)
        (local $pointer i32)
        (call $create_list)
@@ -800,4 +845,5 @@
  (export "add_element" (func $add_element))
  (export "add_gc_element" (func $add_gc_element)))
  (export "find_position_in_alist_from_key_addr" (func $find_position_in_alist_from_key_addr))
+ (export "decrease_gc_el_rc" (func $decrease_gc_el_rc))
  (export "get_gc_el_rc_count" (func $get_gc_el_rc_count)))

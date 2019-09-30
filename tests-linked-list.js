@@ -746,7 +746,22 @@ class Test_free_gc_list extends Test {
         ];
     }
 
+    test_find_position_in_alist_from_key_addr(exports) {
+        const {
+            create_list,
+            create_gc_list,
+            find_position_in_alist_from_key_addr,
+        } = exports;
+
+        const rc_tab = create_list();
+        const gc_list1 = create_gc_list(rc_tab);
+        const gc_list2 = create_gc_list(rc_tab);
+        this.test(find_position_in_alist_from_key_addr(rc_tab, gc_list1), 1);
+        this.test(find_position_in_alist_from_key_addr(rc_tab, gc_list2), 2);
+    }
+
     test_suite(exports) {
+        this.test_find_position_in_alist_from_key_addr(exports);
         const {
             create_list,
             free_gc_list,

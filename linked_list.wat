@@ -380,6 +380,55 @@
        (call $cdr_addr)
        (i32.load))
 
+
+ (func $find_position_in_alist_from_key_addr (param $alist_addr i32)
+                                             (param $key_addr i32)
+                                             (result i32)
+       (local $counter i32)
+       (local $pointer1 i32)
+       (local $pointer2 i32)
+       (local $return i32)
+       (set_local $return (get_global $null_char))
+       (set_local $counter (i32.const 1))
+       (block $iter
+         (loop
+          (get_local $alist_addr)
+          (get_local $counter)
+          (call $find_nth_element)
+          (set_local $pointer2)
+          (get_local $pointer2)
+          (call $car)
+          (set_local $pointer1)
+          (get_local $pointer1)
+          (i32.const 1)
+          (call $find_nth_element)
+          (call $car)
+          (get_local $key_addr)
+          (i32.eq)
+          (if
+              (then
+               (get_local $counter)
+               (set_local $return)))
+
+
+          (get_local $pointer2)
+          (call $cdr)
+          (get_global $list_end_char)
+          (i32.eq)
+          (get_local $return)
+          (get_global $null_char)
+          (i32.ne)
+          (i32.or)
+          (br_if $iter)
+
+          (get_local $counter)
+          (i32.const 1)
+          (i32.add)
+          (set_local $counter)
+
+          (br 0)))
+       (get_local $return))
+
  (func $find_value_in_alist_from_key (param $alist_addr i32) (param $key i32) (result i32)
        (local $counter i32)
        (local $pointer1 i32)
@@ -739,3 +788,4 @@
  (export "find_last_element" (func $find_last_element))
  (export "add_element" (func $add_element))
  (export "add_gc_element" (func $add_gc_element)))
+ (export "find_position_in_alist_from_key_addr" (func $find_position_in_alist_from_key_addr))

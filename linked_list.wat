@@ -227,13 +227,13 @@
        (call $find_nth_element))
 
  (func $add_element (param $list_addr i32)
-                    (param $el i32)
+                    (param $el_value i32)
                     (param $el_type i32)
                     (result i32)
        (local $pointer i32)
 
        (get_local $el_type)
-       (get_local $el)
+       (get_local $el_value)
        (get_global $list_end_char)
        (call $create_list_el)
        (set_local $pointer)

@@ -1192,6 +1192,8 @@ class Test_free_flat_list extends Test {
     }
 }
 
+new Test_create_gc_list_el("gc_list_el")
+new Test_free_gc_list_el("free_gc_list_el");
 new Test_free_gc_list("free_gc_list");
 new Test_add_gc_element("add gc element");
 new Test_create_gc_list("create_gc_list");
@@ -1217,6 +1219,3 @@ new Test_free_flat_list("Free flat list");
 new Test_Test("Base test class");
 new Test_remove_nth_list_el("remove_nth_list_el");
 new Test_get_list_length("get list length");
-new Test_create_gc_list_el("gc_list_el")
-new Test_free_gc_list_el("free_gc_list_el");
-new Test_add_gc_element("add gc element");

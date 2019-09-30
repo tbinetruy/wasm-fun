@@ -1193,7 +1193,7 @@ class Test_free_flat_list extends Test {
 }
 
 new Test_free_gc_list("free_gc_list");
-new Test_garbage_collect("garbage_collect");
+new Test_add_gc_element("add gc element");
 new Test_create_gc_list("create_gc_list");
 new Test_free("free");
 new Test_free_list_el("free_list_el");

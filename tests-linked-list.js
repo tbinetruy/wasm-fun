@@ -864,8 +864,8 @@ class Test_free_gc_list extends Test {
      */
     check_addr_rc_value(rc_tab, addr, value) {
         return rc_tab
-          .map(e => e[1] === value)
-          .reduce((acc, e) => (e ? acc + 1 : acc));
+            .map(e => e[1] === value)
+            .reduce((acc, e) => (e && e[0] === addr ? acc + 1 : acc))
     }
 }
 

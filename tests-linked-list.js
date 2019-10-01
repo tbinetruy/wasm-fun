@@ -674,6 +674,7 @@ class Test_free_gc_list extends Test {
         //for(let i = 0; i < spec.length; i++) {
         //    i32[i] = spec[i];
         //}
+        this.mem = i32
     }
 
     get_init_memory_layout() {
@@ -823,24 +824,97 @@ class Test_free_gc_list extends Test {
         add_gc_element(rc_tab, gc_sublist2, 100, DELIMETERS.type_i32);
         add_gc_element(rc_tab, gc_sublist2, 200, DELIMETERS.type_i32);
 
-        this.debug()
-        console.log(this.read_list(rc_tab))
-        console.log(this.read_list(gc_list), window.mem[396/4 + 2], window.mem[816/4 + 1])
+
+        // save list element addresses to check later that they were freed
+        // properly
+        const gc_list_mem_layout = this.get_list_memory_layout(gc_list, exports);
+        const gc_sublist1_mem_layout = this.get_list_memory_layout(
+            gc_sublist1, exports);
+
+        // save rc_tab list element address later that the proper entries
+        // were freed properly
+        const rc_tab_mem_layout_before = this.get_rc_tab_memory_layout(
+            rc_tab, exports);
+
+        // decrease gc_list before testing to see what happens
         decrease_gc_el_rc(rc_tab, gc_list)
-        console.log(gc_sublist2, window.mem[396/4 + 2], window.mem[816/4 + 1])
-        console.log(this.read_list(gc_sublist2))
 
         // test that gc_list and gc_sublist1 are not in rc_tab anymore
-        // but that sublist2 is with 1 as reference counter
         const rc_tab_js = this.read_list(rc_tab)
-        console.log(rc_tab_js)
         this.test(this.contains_addr(rc_tab_js, gc_list), false)
-
         this.test(this.contains_addr(rc_tab_js, gc_sublist1), false)
-        this.test(this.contains_addr(rc_tab_js, gc_sublist2), true)
 
+        // but that sublist2 is with 1 as reference counter
+        this.test(this.contains_addr(rc_tab_js, gc_sublist2), true)
         this.test(this.check_addr_rc_value(rc_tab_js, gc_sublist2, 1), true)
 
+        // Check that gc_list and gc_sublist1 were freed propely
+        this.test(
+            this.check_list_was_freed(gc_list_mem_layout, exports), true)
+        this.test(
+            this.check_list_was_freed(gc_sublist1_mem_layout, exports), true)
+
+        // Check that gc_sublist2 is still in memory
+        this.test(
+            JSON.stringify(this.read_list(gc_sublist2)),
+            JSON.stringify([100, 200]),
+        );
+
+        // Check that rc_tab entries were freed
+        const rc_tab_mem_layout_after = this.get_list_memory_layout(
+            rc_tab, exports);
+        for(let entry of rc_tab_mem_layout_before) {
+            if(!rc_tab_mem_layout_after.includes(entry.addr)) {
+                // check that child was freed
+                this.test(
+                    this.check_list_was_freed(entry.child_mem_layout, exports), true)
+            }
+        }
+    }
+
+    is_el_free(el_p) {
+        for(let i of [0, 1, 2]) {
+            if(this.mem[el_p/4 + i] === DELIMETERS.null) {
+                return true
+            }
+        }
+        return false
+    }
+
+    check_list_was_freed(list_memory_layout, api) {
+        let should_return_true = false
+        for(let el_p of list_memory_layout) {
+            if(this.is_el_free(el_p))
+                should_return_true = true
+        };
+        return should_return_true
+    }
+
+    get_rc_tab_memory_layout(rc_tab, api) {
+        const rc_tab_mem_layout = this.get_list_memory_layout(
+            rc_tab, api);
+        return rc_tab_mem_layout.map(e => ({
+            addr: e,
+            child_mem_layout: this.get_list_memory_layout(rc_tab, api),
+        }))
+    }
+
+    get_list_memory_layout(list_p, api) {
+        const addrs = [list_p];
+        let is_list_end = false;
+        let i = 0;
+        let current_el_p = list_p;
+        do {
+            const next_el_p = api.cdr(current_el_p)
+            addrs.push(next_el_p)
+            if(next_el_p === DELIMETERS.list_end)
+                is_list_end = true
+
+            i++;
+            current_el_p = next_el_p
+        } while(!is_list_end)
+
+        return addrs
     }
 
     /**
